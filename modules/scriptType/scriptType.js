@@ -19,7 +19,7 @@ exports.scriptType = async (wksht, httpRequestCount) => {
             .subtract(2, "days")
             .format("LL");
 
-        if (httpRequestCount < 1) {
+        if (httpRequestCount < 2) {
             await sheet.loadCells("H:H");
             googleSheet.numContacts = sheet.cellStats.nonEmpty;
             await sheet.loadCells("I:I");
