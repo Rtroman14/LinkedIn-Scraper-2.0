@@ -5,7 +5,7 @@ module.exports = async (allContactsData, scriptMode) => {
     let date = `${today.getMonth()}-${today.getDate()}-${today.getFullYear()}`;
 
     // push data to CSV and export
-    const csv = new ObjectsToCsv(allContactsData);
+    const csv = new ObjectsToCsv(allContactsData.contacts);
     // Save to file
     await csv.toDisk(`./contactData_${scriptMode}_${date}.csv`);
 };
