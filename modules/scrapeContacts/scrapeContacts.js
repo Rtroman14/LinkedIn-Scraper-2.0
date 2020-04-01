@@ -1,11 +1,19 @@
-module.exports = async (page, contacts) => {
+module.exports = async (page, contacts, httpRequestCount) => {
     try {
+        let allContactsData = {
+            httpRequestCount: "",
+            contacts: []
+        };
+
+        allContactsData.httpRequestCount = httpRequestCount;
+
         // scrape each contacts page
         for (let contact of contacts) {
             await page.waitFor(randomWait());
             await page.goto(`${contact}detail/contact-info/`, {
                 waitUntil: "networkidle2"
             });
+            allContactsData.httpRequestCount++;
 
             // scrape profile page
             let contactData = await page.evaluate(contact => {
@@ -53,8 +61,10 @@ module.exports = async (page, contacts) => {
                 return contactObj;
             }, contact);
 
-            allContactsData.push(contactData);
+            allContactsData.contacts.push(contactData);
         }
+
+        return allContactsData;
     } catch (error) {
         console.log(error);
     }
