@@ -34,48 +34,48 @@ let httpRequestCount = 0;
         await login(username, password, page);
         console.log(`Logged in as ${username}.`);
 
-        // while loop here. maximum 2 loops. if scripMode = true
+        while (scriptMode) {
+            // Check how to run the script (initial or update)
+            googleSheet = await scriptType(wksht, httpRequestCount);
+            scriptMode = googleSheet.scriptMode;
 
-        // Check how to run the script (initial or update)
-        googleSheet = await scriptType(wksht, httpRequestCount);
-        scriptMode = googleSheet.scriptMode;
+            // collect contacts URL
+            let contacts = [];
 
-        // collect contacts URL
-        let contacts = [];
-        // collect all contacts info
-        let allContactsData = [];
+            if (scriptMode !== "Resume") {
+                // navigate to connections page
+                await page.goto("https://www.linkedin.com/mynetwork/invite-connect/connections/", {
+                    waitUntil: "networkidle2"
+                });
+                httpRequestCount++;
 
-        if (scriptMode !== "Resume") {
-            // navigate to connections page
-            await page.goto("https://www.linkedin.com/mynetwork/invite-connect/connections/", {
-                waitUntil: "networkidle2"
-            });
-            httpRequestCount++;
+                let lastContact = googleSheet.lastContact;
+                let secondLastContact = googleSheet.secondLastContact;
 
-            let lastContact = googleSheet.lastContact;
-            let secondLastContact = googleSheet.secondLastContact;
+                // scroll
+                let lastContactIndex = await page.evaluate(scrollPage(scriptMode, lastContact, secondLastContact));
 
-            // scroll
-            let lastContactIndex = await page.evaluate(scrollPage(scriptMode, lastContact, secondLastContact));
+                // record each contacts URL
+                contacts = await recordContactUrls(page, scriptMode, lastContactIndex);
+            } else if (scriptMode === "Resume") {
+                contacts = [...googleSheet.contacts];
+            } else {
+                console.log("Run script later....");
+                break;
+            }
 
-            // record each contacts URL
-            contacts = await recordContactUrls(page, scriptMode, lastContactIndex);
-        } else if (scriptMode === "Resume") {
-            contacts = [...googleSheet.contacts];
-        } else {
-            console.log("Run script later....");
-            break;
+            // scrape each contacts page
+            let allContactsData = await scrapeContacts(page, contacts, httpRequestCount);
+
+            httpRequestCount = allContactsData.httpRequestCount;
+
+            // export scraped contacts
+            await exportData(allContactsData, scriptMode);
         }
-
-        // scrape each contacts page
-        await scrapeContacts(page, contacts);
 
         // close browser
         await browser.close();
         console.log("Browser closed.");
-
-        // export scraped contacts
-        await exportData(allContactsData, scriptMode);
     } catch (error) {
         console.log(`Our error = ${error}`);
 
@@ -83,5 +83,3 @@ let httpRequestCount = 0;
         await exportData(allContactsData, scriptMode);
     }
 })();
-
-// UPDATE HTTPREQUESTCOUNT
