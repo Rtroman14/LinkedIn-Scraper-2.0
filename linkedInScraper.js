@@ -35,12 +35,15 @@ let httpRequestCount = 0;
         console.log(`Logged in as ${username}.`);
 
         while (scriptMode) {
-            // Check how to run the script (initial or update)
+            // Check how to run the script (initial, update, resume)
             googleSheet = await scriptType(wksht, httpRequestCount);
             scriptMode = googleSheet.scriptMode;
 
             // collect contacts URL
             let contacts = [];
+
+            // future contacts to scrape from "Initial" scriptMode
+            let futureContacts = [];
 
             if (scriptMode !== "Resume") {
                 // navigate to connections page
@@ -55,8 +58,11 @@ let httpRequestCount = 0;
                 // scroll
                 let lastContactIndex = await page.evaluate(scrollPage(scriptMode, lastContact, secondLastContact));
 
-                // record each contacts URL
                 contacts = await recordContactUrls(page, scriptMode, lastContactIndex);
+
+                if (scriptMode === "Initial" && contacts.length > 80) {
+                    futureContacts = contacts.splice(80);
+                }
             } else if (scriptMode === "Resume") {
                 contacts = [...googleSheet.contacts];
             } else {
@@ -69,8 +75,33 @@ let httpRequestCount = 0;
 
             httpRequestCount = allContactsData.httpRequestCount;
 
+            if (scriptMode === "Initial" && futureContacts.length > 0) {
+                // push futureContacts onto allContactsData.contacts object
+                futureContacts.forEach(profile => {
+                    let contactObj = {};
+                    contactObj.firstName = "";
+                    contactObj.lastName = "";
+                    contactObj.job = "";
+                    contactObj.city = "";
+                    contactObj.company = "";
+                    contactObj.email = "";
+                    contactObj.phone = "";
+                    contactObj.profile = profile;
+                    contactObj.connected = "";
+                    contactObj.birthday = "";
+                    allContactsData.contacts.push(contactObj);
+                });
+            }
+
             // export scraped contacts
             await exportData(allContactsData, scriptMode);
+
+            if (httpRequestCount > 80) {
+                // close browser
+                await browser.close();
+                console.log("Browser closed.");
+                break;
+            }
         }
 
         // close browser
