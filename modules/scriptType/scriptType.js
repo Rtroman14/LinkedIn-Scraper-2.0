@@ -31,7 +31,7 @@ exports.scriptType = async (wksht, httpRequestCount) => {
                 googleSheet.scriptMode = "Initial";
 
                 return googleSheet;
-            } else if (googleSheet.lastRecordedContact < twoDaysAgo) {
+            } else if (googleSheet.lastRecordedContact > twoDaysAgo) {
                 googleSheet.lastContact = sheet.getCellByA1("H2").formattedValue;
                 googleSheet.secondLastContact = sheet.getCellByA1("H3").formattedValue;
                 googleSheet.scriptMode = "Update";
@@ -56,7 +56,7 @@ exports.scriptType = async (wksht, httpRequestCount) => {
                 googleSheet.contacts = [];
 
                 // push next contacts to scrape to array
-                for (let i = 0; i < 10; i++) {
+                for (let i = 0; i < httpRequestCount; i++) {
                     googleSheet.contacts.push(sheet.getCell(googleSheet.numRecordedContacts + i, 7).formattedValue);
                 }
 
