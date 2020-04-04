@@ -15,9 +15,7 @@ exports.scriptType = async (wksht, httpRequestCount) => {
         await doc.loadInfo();
         let sheet = doc.sheetsById[wksht];
 
-        let twoDaysAgo = moment()
-            .subtract(2, "days")
-            .format("LL");
+        let twoDaysAgo = moment().subtract(2, "days").format("LL");
 
         if (httpRequestCount < 2) {
             await sheet.loadCells("H:H");
@@ -38,12 +36,11 @@ exports.scriptType = async (wksht, httpRequestCount) => {
 
                 return googleSheet;
             } else {
-                let nextRunDate = moment(googleSheet.lastRecordedContact, "MMMM DD, YYYY")
-                    .add(2, "days")
-                    .format("LL");
+                let nextRunDate = moment(googleSheet.lastRecordedContact, "MMMM DD, YYYY").add(2, "days").format("LL");
                 console.log(`To fly under LinkedIn's radar, please don't run the script on this account until ${nextRunDate}`);
 
-                return false;
+                let scriptMode = false;
+                return scriptMode;
             }
         } else {
             await sheet.loadCells("H:H");
@@ -62,12 +59,14 @@ exports.scriptType = async (wksht, httpRequestCount) => {
 
                 return googleSheet;
             } else {
-                return false;
+                let scriptMode = false;
+                return scriptMode;
             }
         }
     } catch (error) {
         console.log(error);
 
-        return false;
+        let scriptMode = false;
+        return scriptMode;
     }
 };
