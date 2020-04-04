@@ -3,13 +3,13 @@ const puppeteer = require("puppeteer"),
     { scriptType } = require("./modules/scriptType/scriptType"),
     login = require("./modules/login/login"),
     scrollPage = require("./modules/scrollPage/scrollPage"),
-    recordContactUrls = require("./modules/recordContactUrls/recordContactUrls"),
+    // recordContactUrls = require("./modules/recordContactUrls/recordContactUrls"),
     scrapeContacts = require("./modules/scrapeContacts/scrapeContacts"),
     exportData = require("./modules/exportData/exportData");
 
 let { username, password, wksht } = accounts.users.ryanRoman;
 
-let scriptMode;
+let scriptMode = true;
 let googleSheet;
 
 let httpRequestCount = 0;
@@ -48,17 +48,14 @@ let httpRequestCount = 0;
             if (scriptMode !== "Resume") {
                 // navigate to connections page
                 await page.goto("https://www.linkedin.com/mynetwork/invite-connect/connections/", {
-                    waitUntil: "networkidle2"
+                    waitUntil: "networkidle2",
                 });
                 httpRequestCount++;
 
-                let lastContact = googleSheet.lastContact;
-                let secondLastContact = googleSheet.secondLastContact;
-
                 // scroll
-                let lastContactIndex = await page.evaluate(scrollPage(scriptMode, lastContact, secondLastContact));
+                contacts = await scrollPage(page, googleSheet);
 
-                contacts = await recordContactUrls(page, scriptMode, lastContactIndex);
+                // contacts = await recordContactUrls(page, scriptMode, lastContactIndex);
 
                 if (scriptMode === "Initial" && contacts.length > 80) {
                     futureContacts = contacts.splice(80);
@@ -77,7 +74,7 @@ let httpRequestCount = 0;
 
             if (scriptMode === "Initial" && futureContacts.length > 0) {
                 // push futureContacts onto allContactsData.contacts object
-                futureContacts.forEach(profile => {
+                futureContacts.forEach((profile) => {
                     let contactObj = {};
                     contactObj.firstName = "";
                     contactObj.lastName = "";
