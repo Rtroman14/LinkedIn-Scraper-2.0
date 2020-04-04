@@ -2,7 +2,7 @@ module.exports = async (page, contacts, httpRequestCount) => {
     try {
         let allContactsData = {
             httpRequestCount: "",
-            contacts: []
+            contacts: [],
         };
 
         allContactsData.httpRequestCount = httpRequestCount;
@@ -11,12 +11,12 @@ module.exports = async (page, contacts, httpRequestCount) => {
         for (let contact of contacts) {
             await page.waitFor(randomWait());
             await page.goto(`${contact}detail/contact-info/`, {
-                waitUntil: "networkidle2"
+                waitUntil: "networkidle2",
             });
             allContactsData.httpRequestCount++;
 
             // scrape profile page
-            let contactData = await page.evaluate(contact => {
+            let contactData = await page.evaluate((contact) => {
                 let contactObj = {};
 
                 let getText = (doc, selector) => {
@@ -42,10 +42,7 @@ module.exports = async (page, contacts, httpRequestCount) => {
                     let name = getText(document, "li.t-24");
 
                     contactObj.firstName = name.split(" ")[0];
-                    contactObj.lastName = name
-                        .split(" ")
-                        .slice(1)
-                        .join(" ");
+                    contactObj.lastName = name.split(" ").slice(1).join(" ");
                     contactObj.job = getText(document, "h2.t-18");
                     contactObj.city = getText(document, ".pv-top-card--list-bullet > li");
                     contactObj.company = getText(document, "span.lt-line-clamp--multi-line");
@@ -71,6 +68,6 @@ module.exports = async (page, contacts, httpRequestCount) => {
 };
 
 // Create wait on each page
-const randomWait = async () => {
-    return Math.floor(Math.random() * 5 + 2);
+const randomWait = () => {
+    return Math.floor(Math.random() * 5000 + 3000);
 };
