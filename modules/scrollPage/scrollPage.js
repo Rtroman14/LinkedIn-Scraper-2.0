@@ -32,11 +32,11 @@ module.exports = async (page, googleSheet) => {
                 let contacts = await page.evaluate(extractContactUrls);
 
                 // break while loop if lastContact in DOM
-                contacts.forEach((url, index) => {
-                    if (url === (lastContact || secondLastContact)) {
-                        return contacts.splice(0, index);
+                for (let i = 0; i < contacts.length; i++) {
+                    if (contacts[i] === (lastContact || secondLastContact)) {
+                        return contacts.splice(0, i);
                     }
-                });
+                }
             }
 
             currentHeight = await page.evaluate("document.scrollingElement.scrollHeight");
