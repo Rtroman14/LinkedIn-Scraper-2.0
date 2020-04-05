@@ -11,13 +11,17 @@ exports.scriptType = async (wksht, httpRequestCount) => {
     try {
         await doc.useServiceAccountAuth(require("./keys.json"));
 
-        // loads document properties and worksheets
-        await doc.loadInfo();
-        let sheet = doc.sheetsById[wksht];
+        // // loads document properties and worksheets
+        // await doc.loadInfo();
+        // let sheet = doc.sheetsById[wksht];
 
         let twoDaysAgo = moment().subtract(2, "days").format("LL");
 
         if (httpRequestCount < 2) {
+            // loads document properties and worksheets
+            await doc.loadInfo();
+            let sheet = doc.sheetsById[wksht];
+
             await sheet.loadCells("H:H");
             googleSheet.numContacts = sheet.cellStats.nonEmpty;
             await sheet.loadCells("I:I");
@@ -39,34 +43,39 @@ exports.scriptType = async (wksht, httpRequestCount) => {
                 let nextRunDate = moment(googleSheet.lastRecordedContact, "MMMM DD, YYYY").add(2, "days").format("LL");
                 console.log(`To fly under LinkedIn's radar, please don't run the script on this account until ${nextRunDate}`);
 
-                let scriptMode = false;
-                return scriptMode;
+                googleSheet.scriptMode = false;
+                return googleSheet;
             }
         } else {
-            await sheet.loadCells("H:H");
-            googleSheet.numContacts = sheet.cellStats.nonEmpty;
-            await sheet.loadCells("I:I");
-            googleSheet.numRecordedContacts = sheet.cellStats.nonEmpty - googleSheet.numContacts;
-
             if (googleSheet.numRecordedContacts < googleSheet.numContacts) {
                 googleSheet.scriptMode = "Resume";
                 googleSheet.contacts = [];
 
+                await doc.loadInfo();
+                let sheet = doc.sheetsById[wksht];
+                await sheet.loadCells("H:H");
+                await sheet.loadCells("I:I");
+
+                // decide how many contacts to scrape
+                let httpLimit = 80 - httpRequestCount;
+                let remainingContacts = googleSheet.numContacts - googleSheet.numRecordedContacts;
+                let contactsToScrape = Math.min(httpLimit, remainingContacts);
+
                 // push next contacts to scrape to array
-                for (let i = 0; i < httpRequestCount; i++) {
+                for (let i = 0; i < contactsToScrape; i++) {
                     googleSheet.contacts.push(sheet.getCell(googleSheet.numRecordedContacts + i, 7).formattedValue);
                 }
 
                 return googleSheet;
             } else {
-                let scriptMode = false;
-                return scriptMode;
+                googleSheet.scriptMode = false;
+                return googleSheet;
             }
         }
     } catch (error) {
         console.log(error);
 
-        let scriptMode = false;
-        return scriptMode;
+        googleSheet.scriptMode = false;
+        return googleSheet;
     }
 };
