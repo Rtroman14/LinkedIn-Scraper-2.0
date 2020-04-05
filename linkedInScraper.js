@@ -3,7 +3,6 @@ const puppeteer = require("puppeteer"),
     { scriptType } = require("./modules/scriptType/scriptType"),
     login = require("./modules/login/login"),
     scrollPage = require("./modules/scrollPage/scrollPage"),
-    // recordContactUrls = require("./modules/recordContactUrls/recordContactUrls"),
     scrapeContacts = require("./modules/scrapeContacts/scrapeContacts"),
     exportData = require("./modules/exportData/exportData");
 
@@ -39,6 +38,10 @@ let httpRequestCount = 0;
             googleSheet = await scriptType(wksht, httpRequestCount);
             scriptMode = googleSheet.scriptMode;
 
+            if (!scriptMode) {
+                break;
+            }
+
             // collect contacts URL
             let contacts = [];
 
@@ -55,13 +58,13 @@ let httpRequestCount = 0;
                 // scroll
                 contacts = await scrollPage(page, googleSheet);
 
-                // contacts = await recordContactUrls(page, scriptMode, lastContactIndex);
-
                 if (scriptMode === "Initial" && contacts.length > 80) {
                     futureContacts = contacts.splice(80);
+                } else if (scriptMode === "Update" && contacts.length < 1) {
+                    googleSheet = await scriptType(wksht, httpRequestCount);
+                    scriptMode = googleSheet.scriptMode;
+                    contacts = [...googleSheet.contacts];
                 }
-            } else if (scriptMode === "Resume") {
-                contacts = [...googleSheet.contacts];
             } else {
                 console.log("Run script later....");
                 break;
@@ -94,10 +97,9 @@ let httpRequestCount = 0;
             await exportData(allContactsData, scriptMode);
 
             if (httpRequestCount > 80) {
-                // close browser
-                await browser.close();
-                console.log("Browser closed.");
-                break;
+                scriptMode = false;
+            } else if (scriptMode === "Resume") {
+                scriptMode = false;
             }
         }
 
