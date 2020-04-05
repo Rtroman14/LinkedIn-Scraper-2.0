@@ -11,10 +11,6 @@ exports.scriptType = async (wksht, httpRequestCount) => {
     try {
         await doc.useServiceAccountAuth(require("./keys.json"));
 
-        // // loads document properties and worksheets
-        // await doc.loadInfo();
-        // let sheet = doc.sheetsById[wksht];
-
         let twoDaysAgo = moment().subtract(2, "days").format("LL");
 
         if (httpRequestCount < 2) {
@@ -48,13 +44,13 @@ exports.scriptType = async (wksht, httpRequestCount) => {
             }
         } else {
             if (googleSheet.numRecordedContacts < googleSheet.numContacts) {
-                googleSheet.scriptMode = "Resume";
-                googleSheet.contacts = [];
-
-                await doc.loadInfo();
                 let sheet = doc.sheetsById[wksht];
+                await doc.loadInfo();
                 await sheet.loadCells("H:H");
                 await sheet.loadCells("I:I");
+
+                googleSheet.scriptMode = "Resume";
+                googleSheet.contacts = [];
 
                 // decide how many contacts to scrape
                 let httpLimit = 80 - httpRequestCount;
