@@ -21,5 +21,6 @@ const puppeteer = require("puppeteer");
 Check out "Flowchart.png" to visually understand how this script works.
 
 1. Create new tab in Google Sheets for LinkedIn user
-2. Update "accounts.js" with correct information
-3. Run script
+2. Setup Google API keys for Google Sheets and add to scriptType directory
+3. Update "accounts.js" with correct information
+4. Run script
