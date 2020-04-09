@@ -15,7 +15,7 @@ let httpRequestCount = 0;
 
 (async () => {
     try {
-        const browser = await puppeteer.launch({ headless: false });
+        const browser = await puppeteer.launch({ headless: true });
         const page = await browser.newPage();
         await page.setViewport({ width: 1366, height: 768 });
 
@@ -66,8 +66,7 @@ let httpRequestCount = 0;
                     contacts = [...googleSheet.contacts];
                 }
             } else {
-                console.log("Run script later....");
-                break;
+                contacts = [...googleSheet.contacts];
             }
 
             // scrape each contacts page
@@ -111,5 +110,8 @@ let httpRequestCount = 0;
 
         // export scraped contacts
         await exportData(allContactsData, scriptMode);
+
+        // take screenshot to analyze problem
+        await page.screenshot({ path: "./image.jpg", type: "jpeg" });
     }
 })();
