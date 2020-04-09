@@ -2,7 +2,7 @@ const ObjectsToCsv = require("objects-to-csv");
 
 module.exports = async (allContactsData, scriptMode) => {
     let today = new Date();
-    let date = `${today.getMonth()}-${today.getDate()}-${today.getFullYear()}`;
+    let date = `${today.getMonth() + 1}-${today.getDate()}-${today.getFullYear()}`;
 
     // push data to CSV and export
     const csv = new ObjectsToCsv(allContactsData.contacts);
