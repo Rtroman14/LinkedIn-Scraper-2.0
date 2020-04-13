@@ -65,8 +65,8 @@ module.exports = async (page, contacts, httpRequestCount) => {
                         contactObj.profile = contact;
                         contactObj.connected = contactInfo("Connected", ".pv-contact-info__contact-item");
                         contactObj.birthday = contactInfo("Birthday", ".pv-contact-info__contact-item");
-                    } catch (err) {
-                        console.log(err);
+                    } catch (error) {
+                        console.log(`contactObj error = ${error}`);
                     }
 
                     return contactObj;
@@ -78,11 +78,13 @@ module.exports = async (page, contacts, httpRequestCount) => {
 
         return allContactsData;
     } catch (error) {
-        console.log(error);
+        console.log(`scrapeContacts error = ${error}`);
+
+        return allContactsData;
     }
 };
 
 // Create wait on each page
 const randomWait = () => {
-    return Math.floor(Math.random() * 5000 + 3000);
+    return Math.floor(Math.random() * 10000 + 10000);
 };
