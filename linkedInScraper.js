@@ -6,7 +6,7 @@ const puppeteer = require("puppeteer"),
     scrapeContacts = require("./modules/scrapeContacts/scrapeContacts"),
     exportData = require("./modules/exportData/exportData");
 
-let { username, password, wksht } = accounts.users.ryanRoman;
+let { username, password, wksht } = accounts.users.royMartin;
 
 let scriptMode = true;
 let googleSheet;
@@ -15,7 +15,7 @@ let httpRequestCount = 0;
 
 (async () => {
     try {
-        const browser = await puppeteer.launch({ headless: true });
+        const browser = await puppeteer.launch({ headless: false });
         const page = await browser.newPage();
         await page.setViewport({ width: 1366, height: 768 });
 
@@ -106,12 +106,12 @@ let httpRequestCount = 0;
         await browser.close();
         console.log("Browser closed.");
     } catch (error) {
-        console.log(`Our error = ${error}`);
-
-        // export scraped contacts
-        await exportData(allContactsData, scriptMode);
+        console.log(`linkedInScraper.js error = ${error}`);
 
         // take screenshot to analyze problem
         await page.screenshot({ path: "./image.jpg", type: "jpeg" });
+
+        // export scraped contacts
+        await exportData(allContactsData, scriptMode);
     }
 })();
