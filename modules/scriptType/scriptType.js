@@ -69,7 +69,7 @@ exports.scriptType = async (wksht, httpRequestCount) => {
             }
         }
     } catch (error) {
-        console.log(error);
+        console.log(`scriptType error = ${error}`);
 
         googleSheet.scriptMode = false;
         return googleSheet;
