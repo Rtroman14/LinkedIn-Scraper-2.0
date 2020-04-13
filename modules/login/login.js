@@ -6,7 +6,7 @@ module.exports = async (username, password, page) => {
         await page.type("#username", username, { delay: 30 });
         await page.type("#password", password, { delay: 30 });
         await page.click(loginBtn, { delay: 30 });
-    } catch (err) {
-        console.log(err);
+    } catch (error) {
+        console.log(`Login error = ${error}`);
     }
 };
