@@ -7,6 +7,8 @@ module.exports = async (page, contacts, httpRequestCount) => {
 
         allContactsData.httpRequestCount = httpRequestCount;
 
+        console.log("Scraping contacts...");
+
         // scrape each contacts page
         for (let contact of contacts) {
             await page.waitFor(randomWait());
