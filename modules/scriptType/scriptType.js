@@ -29,7 +29,7 @@ exports.scriptType = async (wksht, httpRequestCount) => {
                 googleSheet.scriptMode = "Initial";
 
                 return googleSheet;
-            } else if (googleSheet.lastRecordedContact > twoDaysAgo) {
+            } else if (googleSheet.lastRecordedContact < twoDaysAgo) {
                 googleSheet.lastContact = sheet.getCellByA1("H2").formattedValue;
                 googleSheet.secondLastContact = sheet.getCellByA1("H3").formattedValue;
                 googleSheet.scriptMode = "Update";
