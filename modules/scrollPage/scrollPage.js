@@ -39,6 +39,8 @@ module.exports = async (page, googleSheet) => {
                 }
             }
 
+            console.log("Scrolling...");
+
             currentHeight = await page.evaluate("document.scrollingElement.scrollHeight");
         }
 
