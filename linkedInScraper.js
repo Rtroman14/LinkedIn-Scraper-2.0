@@ -6,7 +6,7 @@ const puppeteer = require("puppeteer"),
     scrapeContacts = require("./modules/scrapeContacts/scrapeContacts"),
     exportData = require("./modules/exportData/exportData");
 
-let { username, password, wksht } = accounts.users.marybeth;
+let { username, password, wksht } = accounts.users.royMartin;
 
 let scriptMode = true;
 let googleSheet;
@@ -31,7 +31,7 @@ let httpRequestCount = 0;
 
         // login
         await login(username, password, page);
-        console.log(`Logged in as ${username}.`);
+        console.log(`Logged in as ${username}`);
 
         while (scriptMode) {
             // Check how to run the script (initial, update, resume)
@@ -106,7 +106,7 @@ let httpRequestCount = 0;
 
         // close browser
         await browser.close();
-        console.log("Browser closed.");
+        console.log("Browser closed");
     } catch (error) {
         console.log(`linkedInScraper.js error = ${error}`);
 
