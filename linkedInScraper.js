@@ -42,6 +42,8 @@ let httpRequestCount = 0;
                 break;
             }
 
+            console.log(`scriptMode = ${scriptMode}`);
+
             // collect contacts URL
             let contacts = [];
 
