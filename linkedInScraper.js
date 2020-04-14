@@ -6,7 +6,7 @@ const puppeteer = require("puppeteer"),
     scrapeContacts = require("./modules/scrapeContacts/scrapeContacts"),
     exportData = require("./modules/exportData/exportData");
 
-let { username, password, wksht } = accounts.users.royMartin;
+let { username, password, wksht } = accounts.users.marybeth;
 
 let scriptMode = true;
 let googleSheet;
@@ -15,7 +15,7 @@ let httpRequestCount = 0;
 
 (async () => {
     try {
-        const browser = await puppeteer.launch({ headless: false });
+        const browser = await puppeteer.launch({ headless: true });
         const page = await browser.newPage();
         await page.setViewport({ width: 1366, height: 768 });
 
@@ -45,7 +45,7 @@ let httpRequestCount = 0;
             // collect contacts URL
             let contacts = [];
 
-            // future contacts to scrape from "Initial" scriptMode
+            // future contacts to scrape
             let futureContacts = [];
 
             if (scriptMode !== "Resume") {
@@ -58,7 +58,7 @@ let httpRequestCount = 0;
                 // scroll
                 contacts = await scrollPage(page, googleSheet);
 
-                if (scriptMode === "Initial" && contacts.length > 80) {
+                if (contacts.length > 80) {
                     futureContacts = contacts.splice(80);
                 } else if (scriptMode === "Update" && contacts.length < 1) {
                     googleSheet = await scriptType(wksht, httpRequestCount);
@@ -74,7 +74,7 @@ let httpRequestCount = 0;
 
             httpRequestCount = allContactsData.httpRequestCount;
 
-            if (scriptMode === "Initial" && futureContacts.length > 0) {
+            if (futureContacts.length > 0) {
                 // push futureContacts onto allContactsData.contacts object
                 futureContacts.forEach((profile) => {
                     let contactObj = {};
