@@ -11,7 +11,6 @@ exports.scriptType = async (wksht, httpRequestCount) => {
     try {
         await doc.useServiceAccountAuth(require("./keys.json"));
 
-        let twoDaysAgo = moment().subtract(2, "days").format("LL");
         let yesterday = moment().subtract(1, "days").format("LL");
         let today = moment().format("LL");
 
@@ -31,11 +30,7 @@ exports.scriptType = async (wksht, httpRequestCount) => {
                 googleSheet.scriptMode = "Initial";
 
                 return googleSheet;
-            } else if (
-                googleSheet.lastRecordedContact !== today &&
-                googleSheet.lastRecordedContact !== yesterday &&
-                googleSheet.lastRecordedContact !== twoDaysAgo
-            ) {
+            } else if (googleSheet.lastRecordedContact !== today && googleSheet.lastRecordedContact !== yesterday) {
                 googleSheet.lastContact = sheet.getCellByA1("H2").formattedValue;
                 googleSheet.secondLastContact = sheet.getCellByA1("H3").formattedValue;
                 googleSheet.scriptMode = "Update";
