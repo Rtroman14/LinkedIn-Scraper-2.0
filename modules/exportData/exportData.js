@@ -8,4 +8,5 @@ module.exports = async (allContactsData, scriptMode) => {
     const csv = new ObjectsToCsv(allContactsData.contacts);
     // Save to file
     await csv.toDisk(`./contactData_${scriptMode}_${date}.csv`);
+    console.log("Exported CSV file...");
 };
