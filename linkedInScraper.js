@@ -6,7 +6,7 @@ const puppeteer = require("puppeteer"),
     scrapeContacts = require("./modules/scrapeContacts/scrapeContacts"),
     exportData = require("./modules/exportData/exportData");
 
-let { username, password, wksht } = accounts.users.royMartin;
+let { username, password, wksht } = accounts.users.ryanRoman;
 
 let scriptMode = true;
 let googleSheet;
@@ -21,11 +21,12 @@ let httpRequestCount = 0;
 
         // robot detection incognito - console.log(navigator.userAgent);
         page.setUserAgent(
-            "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.149 Safari/537.36"
+            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/81.0.4044.113 Safari/537.36"
         );
 
         // navigate to linkedIn
-        let linkedIn = "https://www.linkedin.com/login?fromSignIn=true&trk=guest_homepage-basic_nav-header-signin";
+        let linkedIn =
+            "https://www.linkedin.com/login?fromSignIn=true&trk=guest_homepage-basic_nav-header-signin";
         await page.goto(linkedIn, { waitUntil: "networkidle2" });
         httpRequestCount++;
 
