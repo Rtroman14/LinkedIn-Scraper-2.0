@@ -9,9 +9,13 @@ module.exports = async (page, googleSheet) => {
         let total = 0;
 
         while (previousHeight < currentHeight) {
+            console.log("Scrolling...");
             total++;
             previousHeight = await page.evaluate("document.scrollingElement.scrollHeight");
-            await page.evaluate(`window.scrollBy(0, ${previousHeight})`);
+            await page.evaluate(`window.scrollBy({
+                top: ${previousHeight},
+                behavior: "smooth",
+            })`);
             await new Promise((resolve) => {
                 setTimeout(resolve, 3000);
             });
@@ -38,8 +42,6 @@ module.exports = async (page, googleSheet) => {
                     }
                 }
             }
-
-            console.log("Scrolling...");
 
             currentHeight = await page.evaluate("document.scrollingElement.scrollHeight");
         }
