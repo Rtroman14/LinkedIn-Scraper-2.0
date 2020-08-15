@@ -1,10 +1,10 @@
 const puppeteer = require("puppeteer"),
     accounts = require("./accounts"),
-    { scriptType } = require("./modules/scriptType/scriptType"),
-    login = require("./modules/login/login"),
-    scrollPage = require("./modules/scrollPage/scrollPage"),
-    scrapeContacts = require("./modules/scrapeContacts/scrapeContacts"),
-    exportData = require("./modules/exportData/exportData");
+    { scriptType } = require("./src/scriptType"),
+    login = require("./src/login"),
+    scrollPage = require("./src/scrollPage"),
+    scrapeContacts = require("./src/scrapeContacts"),
+    exportData = require("./src/exportData");
 
 let { username, password, wksht } = accounts.users.ryanRoman;
 
