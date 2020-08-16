@@ -8,7 +8,7 @@ const puppeteer = require("puppeteer"),
 
 let { username, password, wksht } = accounts.users.ryanRoman;
 
-let scriptMode = true;
+let scriptMode = false;
 let googleSheet;
 
 let httpRequestCount = 0;
@@ -24,15 +24,25 @@ let httpRequestCount = 0;
             "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/81.0.4044.113 Safari/537.36"
         );
 
-        // navigate to linkedIn
         let linkedIn =
             "https://www.linkedin.com/login?fromSignIn=true&trk=guest_homepage-basic_nav-header-signin";
-        await page.goto(linkedIn, { waitUntil: "networkidle2" });
-        httpRequestCount++;
 
-        // login
-        await login(username, password, page);
-        console.log(`Logged in as ${username}`);
+        try {
+            // navigate to linkedIn
+            await page.goto(linkedIn, { waitUntil: "networkidle2" });
+            httpRequestCount++;
+        } catch (error) {
+            console.log("Error while navigating to www.linkedin.com");
+        }
+
+        try {
+            // login
+            await login(username, password, page);
+            console.log(`Logged in as ${username}`);
+            scriptMode = true;
+        } catch (error) {
+            console.log("Error while logging in");
+        }
 
         while (scriptMode) {
             // Check how to run the script (initial, update, resume)
@@ -53,9 +63,12 @@ let httpRequestCount = 0;
 
             if (scriptMode !== "Resume") {
                 // navigate to connections page
-                await page.goto("https://www.linkedin.com/mynetwork/invite-connect/connections/", {
-                    waitUntil: "networkidle2",
-                });
+                await page.goto(
+                    "https://www.linkedin.com/mynetwork/invite-connect/connections/",
+                    {
+                        waitUntil: "networkidle2",
+                    }
+                );
                 httpRequestCount++;
 
                 // scroll
@@ -73,7 +86,11 @@ let httpRequestCount = 0;
             }
 
             // scrape each contacts page
-            let allContactsData = await scrapeContacts(page, contacts, httpRequestCount);
+            let allContactsData = await scrapeContacts(
+                page,
+                contacts,
+                httpRequestCount
+            );
 
             httpRequestCount = allContactsData.httpRequestCount;
 
