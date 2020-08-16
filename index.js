@@ -15,7 +15,7 @@ let httpRequestCount = 0;
 
 (async () => {
     try {
-        const browser = await puppeteer.launch({ headless: true });
+        const browser = await puppeteer.launch({ headless: false });
         const page = await browser.newPage();
         await page.setViewport({ width: 1366, height: 768 });
 
@@ -37,7 +37,6 @@ let httpRequestCount = 0;
 
         // login
         let loggedIn = await login(username, password, page);
-        console.log(`Logged in as ${username}`);
 
         while (loggedIn) {
             // Check how to run the script (initial, update, resume)
@@ -58,12 +57,9 @@ let httpRequestCount = 0;
 
             if (scriptMode !== "Resume") {
                 // navigate to connections page
-                await page.goto(
-                    "https://www.linkedin.com/mynetwork/invite-connect/connections/",
-                    {
-                        waitUntil: "networkidle2",
-                    }
-                );
+                await page.goto("https://www.linkedin.com/mynetwork/invite-connect/connections/", {
+                    waitUntil: "networkidle2",
+                });
                 httpRequestCount++;
 
                 // scroll
@@ -81,11 +77,7 @@ let httpRequestCount = 0;
             }
 
             // scrape each contacts page
-            let allContactsData = await scrapeContacts(
-                page,
-                contacts,
-                httpRequestCount
-            );
+            let allContactsData = await scrapeContacts(page, contacts, httpRequestCount);
 
             httpRequestCount = allContactsData.httpRequestCount;
 
