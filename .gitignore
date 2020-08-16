@@ -4,3 +4,4 @@ node_modules
 keys.json
 .env
 .vscode
+.DS_Store
