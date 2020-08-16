@@ -35,16 +35,11 @@ let httpRequestCount = 0;
             console.log("Error while navigating to www.linkedin.com");
         }
 
-        try {
-            // login
-            await login(username, password, page);
-            console.log(`Logged in as ${username}`);
-            scriptMode = true;
-        } catch (error) {
-            console.log("Error while logging in");
-        }
+        // login
+        let loggedIn = await login(username, password, page);
+        console.log(`Logged in as ${username}`);
 
-        while (scriptMode) {
+        while (loggedIn) {
             // Check how to run the script (initial, update, resume)
             googleSheet = await scriptType(wksht, httpRequestCount);
             scriptMode = googleSheet.scriptMode;

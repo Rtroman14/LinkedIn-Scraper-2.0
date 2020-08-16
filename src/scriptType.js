@@ -9,7 +9,7 @@ let googleSheet = {};
 
 exports.scriptType = async (wksht, httpRequestCount) => {
     try {
-        await doc.useServiceAccountAuth(require("./keys.json"));
+        await doc.useServiceAccountAuth(require("../keys.json"));
 
         let yesterday = moment().subtract(1, "days").format("LL");
         let today = moment().format("LL");
@@ -30,15 +30,22 @@ exports.scriptType = async (wksht, httpRequestCount) => {
                 googleSheet.scriptMode = "Initial";
 
                 return googleSheet;
-            } else if (googleSheet.lastRecordedContact !== today && googleSheet.lastRecordedContact !== yesterday) {
+            } else if (
+                googleSheet.lastRecordedContact !== today &&
+                googleSheet.lastRecordedContact !== yesterday
+            ) {
                 googleSheet.lastContact = sheet.getCellByA1("H2").formattedValue;
                 googleSheet.secondLastContact = sheet.getCellByA1("H3").formattedValue;
                 googleSheet.scriptMode = "Update";
 
                 return googleSheet;
             } else {
-                let nextRunDate = moment(googleSheet.lastRecordedContact, "MMMM DD, YYYY").add(2, "days").format("LL");
-                console.log(`To fly under LinkedIn's radar, please don't run the script on this account until ${nextRunDate}`);
+                let nextRunDate = moment(googleSheet.lastRecordedContact, "MMMM DD, YYYY")
+                    .add(2, "days")
+                    .format("LL");
+                console.log(
+                    `To fly under LinkedIn's radar, please don't run the script on this account until ${nextRunDate}`
+                );
 
                 googleSheet.scriptMode = false;
                 return googleSheet;
@@ -60,7 +67,9 @@ exports.scriptType = async (wksht, httpRequestCount) => {
 
                 // push next contacts to scrape to array
                 for (let i = 0; i < contactsToScrape; i++) {
-                    googleSheet.contacts.push(sheet.getCell(googleSheet.numRecordedContacts + i, 7).formattedValue);
+                    googleSheet.contacts.push(
+                        sheet.getCell(googleSheet.numRecordedContacts + i, 7).formattedValue
+                    );
                 }
 
                 return googleSheet;
