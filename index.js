@@ -6,16 +6,15 @@ const puppeteer = require("puppeteer"),
     scrapeContacts = require("./src/scrapeContacts"),
     exportData = require("./src/exportData");
 
-let { username, password, wksht } = accounts.users.ryanRoman;
+let { username, password, wksht } = accounts.users.aaronConfessori;
 
-let scriptMode = false;
 let googleSheet;
 
 let httpRequestCount = 0;
 
 (async () => {
     try {
-        const browser = await puppeteer.launch({ headless: false });
+        const browser = await puppeteer.launch({ headless: true });
         const page = await browser.newPage();
         await page.setViewport({ width: 1366, height: 768 });
 
@@ -47,7 +46,7 @@ let httpRequestCount = 0;
                 break;
             }
 
-            console.log(`scriptMode = ${scriptMode}`);
+            console.log({ scriptMode });
 
             // collect contacts URL
             let contacts = [];
@@ -76,6 +75,8 @@ let httpRequestCount = 0;
                 contacts = [...googleSheet.contacts];
             }
 
+            console.log(`Contacts = ${contacts.length}`);
+
             // scrape each contacts page
             let allContactsData = await scrapeContacts(page, contacts, httpRequestCount);
 
@@ -103,9 +104,9 @@ let httpRequestCount = 0;
             await exportData(allContactsData, scriptMode);
 
             if (httpRequestCount > 80) {
-                scriptMode = false;
+                loggedIn = false;
             } else if (scriptMode === "Resume") {
-                scriptMode = false;
+                loggedIn = false;
             }
         }
 
