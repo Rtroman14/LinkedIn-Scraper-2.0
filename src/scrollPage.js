@@ -12,23 +12,13 @@ module.exports = async (page, googleSheet) => {
             console.log("Scrolling...");
             total++;
             previousHeight = await page.evaluate("document.scrollingElement.scrollHeight");
-            await page.evaluate(`window.scrollBy({
-                top: ${previousHeight},
-                behavior: "smooth",
-            })`);
-            await new Promise((resolve) => {
-                setTimeout(resolve, 3000);
-            });
+            await scroll(page, previousHeight);
 
             // scroll step up to load contacts list
             if (total === 2) {
-                await page.evaluate(`window.scrollBy({
-                    top: -850,
-                    behavior: "smooth",
-                })`);
-                await new Promise((resolve) => {
-                    setTimeout(resolve, 3000);
-                });
+                await scroll(page, -850);
+                await scroll(page, 850);
+                await scroll(page, -250);
             }
 
             // return list of updated contacts
@@ -60,4 +50,14 @@ let extractContactUrls = () => {
         contactUrls.push(contact.href);
     }
     return contactUrls;
+};
+
+let scroll = async (page, amount) => {
+    await page.evaluate(`window.scrollBy({
+        top: ${amount},
+        behavior: "smooth",
+    })`);
+    await new Promise((resolve) => {
+        setTimeout(resolve, 3000);
+    });
 };

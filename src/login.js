@@ -13,7 +13,7 @@ module.exports = async (username, password, page) => {
 
         return true;
     } catch (error) {
-        console.log(`Login error with ${username}'s account --- ${error}`);
+        console.log(`LOGIN ERROR --- ${error}`);
 
         return false;
     }

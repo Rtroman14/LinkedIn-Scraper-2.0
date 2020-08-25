@@ -49,7 +49,8 @@ module.exports = async (page, contacts, httpRequestCount) => {
                     // record contact info
                     let contactInfo = (header, selector) => {
                         for (let section of sections) {
-                            if (getText(section, ".pv-contact-info__header") == header) return getText(section, selector);
+                            if (getText(section, ".pv-contact-info__header") == header)
+                                return getText(section, selector);
                         }
                         return "";
                     };
@@ -63,10 +64,19 @@ module.exports = async (page, contacts, httpRequestCount) => {
                         contactObj.city = getText(document, ".pv-top-card--list-bullet > li");
                         contactObj.company = getText(document, "span.lt-line-clamp--multi-line");
                         contactObj.email = contactInfo("Email", ".pv-contact-info__contact-link");
-                        contactObj.phone = contactInfo("Phone", ".pv-contact-info__ci-container > span");
+                        contactObj.phone = contactInfo(
+                            "Phone",
+                            ".pv-contact-info__ci-container > span"
+                        );
                         contactObj.profile = contact;
-                        contactObj.connected = contactInfo("Connected", ".pv-contact-info__contact-item");
-                        contactObj.birthday = contactInfo("Birthday", ".pv-contact-info__contact-item");
+                        contactObj.connected = contactInfo(
+                            "Connected",
+                            ".pv-contact-info__contact-item"
+                        );
+                        contactObj.birthday = contactInfo(
+                            "Birthday",
+                            ".pv-contact-info__contact-item"
+                        );
                     } catch (error) {
                         console.log(`contactObj error = ${error}`);
                     }
@@ -80,7 +90,7 @@ module.exports = async (page, contacts, httpRequestCount) => {
 
         return allContactsData;
     } catch (error) {
-        console.log(`scrapeContacts error = ${error}`);
+        console.log(`SCRAPECONTACTS ERROR --- ${error}`);
 
         return allContactsData;
     }
