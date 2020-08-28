@@ -3,17 +3,20 @@ const puppeteer = require("puppeteer"),
     { scriptType } = require("./src/scriptType"),
     login = require("./src/login"),
     scrollPage = require("./src/scrollPage"),
-    scrapeContacts = require("./src/scrapeContacts"),
-    exportData = require("./src/exportData");
+    scrapeContacts = require("./src/scrapeContacts");
 
 let { username, password, cookie, base, projectName } = accounts.users.tylerFreilinger;
 
 let httpRequestCount = 0;
 
 // ON AIRTABLE BRANCH !!!
+// SAVE LAST CONTACT AND LAST RUNTIME IN JSON LOCAL FILE !!!
 
 (async () => {
     try {
+        let lastContact;
+        let secondLastContact;
+
         // check if client is eligible to scrape
         try {
             // check last contact from airtable
