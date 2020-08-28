@@ -6,9 +6,7 @@ const puppeteer = require("puppeteer"),
     scrapeContacts = require("./src/scrapeContacts"),
     exportData = require("./src/exportData");
 
-let { username, password, wksht } = accounts.users.randyFlint;
-
-let googleSheet;
+let { username, password, cookie, base, projectName } = accounts.users.tylerFreilinger;
 
 let httpRequestCount = 0;
 
@@ -16,7 +14,14 @@ let httpRequestCount = 0;
 
 (async () => {
     try {
-        const browser = await puppeteer.launch({ headless: true });
+        // check if client is eligible to scrape
+        try {
+            // check last contact from airtable
+        } catch (error) {
+            console.log(error);
+        }
+
+        const browser = await puppeteer.launch({ headless: false });
         const page = await browser.newPage();
         await page.setViewport({ width: 1366, height: 768 });
 
@@ -25,24 +30,49 @@ let httpRequestCount = 0;
             "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.125 Safari/537.36"
         );
 
-        let linkedIn =
-            "https://www.linkedin.com/login?fromSignIn=true&trk=guest_homepage-basic_nav-header-signin";
-
         try {
             // navigate to linkedIn
-            await page.goto(linkedIn, { waitUntil: "networkidle2" });
+            await page.goto(linkedIn, { waitUntil: "networkidle0" });
             httpRequestCount++;
         } catch (error) {
             console.log("Error while navigating to www.linkedin.com");
         }
 
-        // login
-        let loggedIn = await login(username, password, page);
+        // // login
+        // let loggedIn = await login(username, password, page);
+
+        let linkedIn = "https://www.linkedin.com/feed/";
+
+        // login with cookies
+        let loggedIn;
+
+        if (cookies) {
+            // set users auth cookies
+            await page.setCookie({
+                name: "li_at",
+                value: `${cookie}`,
+                domain: "www.linkedin.com",
+            });
+
+            try {
+                await page.goto(linkedIn, { waitUntil: "networkidle0" });
+                httpRequestCount++;
+
+                // wait for element
+                let messageBar = "header.msg-overlay-bubble-header";
+                await page.waitForSelector(messageBar);
+            } catch (error) {
+                console.log("COOKIES HAVE EXPIRED. REPLACE COOKIES AND TRY AGAIN!!");
+                loggedIn = false;
+            }
+        } else {
+            console.log("NEED COOKIES!!!");
+            loggedIn = false;
+        }
 
         while (loggedIn) {
             // Check how to run the script (initial, update, resume)
-            googleSheet = await scriptType(wksht, httpRequestCount);
-            scriptMode = googleSheet.scriptMode;
+            // scriptMode =
 
             if (!scriptMode) {
                 break;
