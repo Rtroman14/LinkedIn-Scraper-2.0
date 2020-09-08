@@ -6,7 +6,7 @@ const puppeteer = require("puppeteer"),
     scrapeContacts = require("./src/scrapeContacts"),
     exportData = require("./src/exportData");
 
-let { username, password, wksht } = accounts.users.joeLesher;
+let { username, password, wksht } = accounts.users.randyFlint;
 
 let googleSheet;
 
@@ -81,7 +81,7 @@ let httpRequestCount = 0;
             // scrape each contacts page
             let allContactsData = await scrapeContacts(page, contacts, httpRequestCount);
 
-            httpRequestCount = allContactsData.httpRequestCount;
+            httpRequestCount = allContactsData.httpRequestCount || 80;
 
             if (futureContacts.length > 0) {
                 // push futureContacts onto allContactsData.contacts object
@@ -104,7 +104,7 @@ let httpRequestCount = 0;
             // export scraped contacts
             await exportData(allContactsData, scriptMode);
 
-            if (httpRequestCount > 80) {
+            if (httpRequestCount >= 80) {
                 loggedIn = false;
             } else if (scriptMode === "Resume") {
                 loggedIn = false;

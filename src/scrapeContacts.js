@@ -1,3 +1,8 @@
+let allContacts = {
+    httpRequestCount: 80,
+    contacts: [],
+};
+
 module.exports = async (page, contacts, httpRequestCount) => {
     try {
         let allContactsData = {
@@ -85,6 +90,7 @@ module.exports = async (page, contacts, httpRequestCount) => {
                 }, contact);
 
                 allContactsData.contacts.push(contactData);
+                allContacts.contacts.push(contactData); // incase failure
             }
         }
 
@@ -92,7 +98,7 @@ module.exports = async (page, contacts, httpRequestCount) => {
     } catch (error) {
         console.log(`SCRAPECONTACTS ERROR --- ${error}`);
 
-        return allContactsData;
+        return allContacts;
     }
 };
 
