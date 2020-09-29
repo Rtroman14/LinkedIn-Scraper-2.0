@@ -7,6 +7,9 @@ const puppeteer = require("puppeteer"),
 
 let { username, password, cookie, base, projectName } = accounts.users.tylerFreilinger;
 
+const mongoose = require("mongoose");
+mongoose.connect(keys.mongoURI, { useNewUrlParser: true, useUnifiedTopology: true });
+
 let httpRequestCount = 0;
 
 // ON AIRTABLE BRANCH !!!
@@ -19,14 +22,40 @@ let httpRequestCount = 0;
 
         // check if client is eligible to scrape
         try {
-            // check last contact from airtable
+            // check last contact from mongoDB
         } catch (error) {
             console.log(error);
         }
 
-        const browser = await puppeteer.launch({ headless: false });
+        const browser = await puppeteer.launch({
+            headless: false,
+            args: [
+                "--proxy-server=zproxy.lum-superproxy.io:22225",
+                // "--no-sandbox",
+                // "--disable-setuid-sandbox",
+                // "--disable-dev-shm-usage",
+                // "--disable-gpu",
+            ],
+        });
         const page = await browser.newPage();
+
+        await page.authenticate({
+            username: proxyUsername,
+            password: proxyPassword,
+        });
+
         await page.setViewport({ width: 1366, height: 768 });
+
+        // turns request interceptor on
+        await page.setRequestInterception(true);
+
+        page.on("request", (request) => {
+            if (request.resourceType() === "image") {
+                request.abort();
+            } else {
+                request.continue();
+            }
+        });
 
         // robot detection incognito - console.log(navigator.userAgent);
         page.setUserAgent(
