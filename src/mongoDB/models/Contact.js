@@ -46,3 +46,6 @@ mongoose.model("users", userSchema);
 // const user = await new User({ googleId: profile.id }).save();
 
 // https://developer.mozilla.org/en-US/docs/Learn/Server-side/Express_Nodejs/mongoose
+
+// https://www.udemy.com/course/node-with-react-fullstack-web-development/learn/lecture/7605216?start=225#questions
+// Lesson 126 - goes into detail on configuring mongoDB documents
