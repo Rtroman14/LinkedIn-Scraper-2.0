@@ -49,3 +49,8 @@ mongoose.model("users", userSchema);
 
 // https://www.udemy.com/course/node-with-react-fullstack-web-development/learn/lecture/7605216?start=225#questions
 // Lesson 126 - goes into detail on configuring mongoDB documents
+
+// https://www.udemy.com/course/node-with-react-fullstack-web-development/learn/lecture/7605218#questions
+// Lesson 127 - creating SubDocs
+
+// MongoDB Docs < 4MB
