@@ -6,7 +6,7 @@ const puppeteer = require("puppeteer"),
     scrapeContacts = require("./src/scrapeContacts"),
     exportData = require("./src/exportData");
 
-const { username, password, proxyUsername, proxyPassword, wksht } = accounts.users.randyBrothers;
+const { username, password, proxyUsername, proxyPassword, wksht } = accounts.users.aaronConfessori;
 
 let googleSheet;
 
@@ -15,9 +15,9 @@ let httpRequestCount = 0;
 (async () => {
     try {
         const browser = await puppeteer.launch({
-            headless: false,
+            headless: true,
             args: [
-                "--proxy-server=zproxy.lum-superproxy.io:22225",
+                // "--proxy-server=zproxy.lum-superproxy.io:22225",
                 // "--no-sandbox",
                 // "--disable-setuid-sandbox",
                 // "--disable-dev-shm-usage",
@@ -25,10 +25,10 @@ let httpRequestCount = 0;
             ],
         });
         const page = await browser.newPage();
-        await page.authenticate({
-            username: proxyUsername,
-            password: proxyPassword,
-        });
+        // await page.authenticate({
+        //     username: proxyUsername,
+        //     password: proxyPassword,
+        // });
         await page.setViewport({ width: 1366, height: 768 });
 
         // turns request interceptor on
