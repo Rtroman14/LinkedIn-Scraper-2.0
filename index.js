@@ -5,6 +5,9 @@ const puppeteer = require("puppeteer"),
     scrollPage = require("./src/scrollPage"),
     scrapeContacts = require("./src/scrapeContacts");
 
+require("./src/mongoDB/models/Users");
+require("./src/mongoDB/models/Connections");
+
 let { username, password, cookie, base, projectName } = accounts.users.tylerFreilinger;
 
 const mongoose = require("mongoose");
