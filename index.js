@@ -6,7 +6,7 @@ const puppeteer = require("puppeteer"),
     scrapeContacts = require("./src/scrapeContacts"),
     exportData = require("./src/exportData");
 
-const { username, password, proxyUsername, proxyPassword, wksht } = accounts.users.aaronConfessori;
+const { username, password, proxyUsername, proxyPassword, wksht } = accounts.users.tylerFreilinger;
 
 let googleSheet;
 
@@ -15,7 +15,7 @@ let httpRequestCount = 0;
 (async () => {
     try {
         const browser = await puppeteer.launch({
-            headless: true,
+            headless: false,
             args: [
                 // "--proxy-server=zproxy.lum-superproxy.io:22225",
                 // "--no-sandbox",
