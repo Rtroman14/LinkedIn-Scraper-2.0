@@ -3,7 +3,8 @@ const puppeteer = require("puppeteer"),
     { scriptType } = require("./src/scriptType"),
     login = require("./src/login"),
     scrollPage = require("./src/scrollPage"),
-    scrapeContacts = require("./src/scrapeContacts");
+    scrapeContacts = require("./src/scrapeContacts"),
+    configBrowser = require("./src/configBrowser");
 
 require("./src/mongoDB/models/Users");
 require("./src/mongoDB/models/Connections");
@@ -14,22 +15,15 @@ const mongoose = require("mongoose");
 mongoose.connect(keys.mongoURI, { useNewUrlParser: true, useUnifiedTopology: true });
 
 let httpRequestCount = 0;
+let httpRequestMax = Math.floor(Math.random() * (80 - 68)) + 68;
+
+// login with cookies
+let loggedIn = false;
 
 // ON AIRTABLE BRANCH !!!
-// SAVE LAST CONTACT AND LAST RUNTIME IN JSON LOCAL FILE !!!
 
 (async () => {
     try {
-        let lastContact;
-        let secondLastContact;
-
-        // check if client is eligible to scrape
-        try {
-            // check last contact from mongoDB
-        } catch (error) {
-            console.log(error);
-        }
-
         const browser = await puppeteer.launch({
             headless: false,
             args: [
@@ -40,74 +34,30 @@ let httpRequestCount = 0;
                 // "--disable-gpu",
             ],
         });
+
         const page = await browser.newPage();
 
-        await page.authenticate({
-            username: proxyUsername,
-            password: proxyPassword,
-        });
-
-        await page.setViewport({ width: 1366, height: 768 });
-
-        // turns request interceptor on
-        await page.setRequestInterception(true);
-
-        page.on("request", (request) => {
-            if (request.resourceType() === "image") {
-                request.abort();
-            } else {
-                request.continue();
-            }
-        });
-
-        // robot detection incognito - console.log(navigator.userAgent);
-        page.setUserAgent(
-            "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.125 Safari/537.36"
-        );
+        await configBrowser(page);
 
         try {
-            // navigate to linkedIn
-            await page.goto(linkedIn, { waitUntil: "networkidle0" });
+            await page.goto("https://www.linkedin.com/feed/", { waitUntil: "networkidle0" });
             httpRequestCount++;
-        } catch (error) {
-            console.log("Error while navigating to www.linkedin.com");
-        }
 
-        // // login
-        // let loggedIn = await login(username, password, page);
+            // wait for element
+            await page.waitForSelector("header.msg-overlay-bubble-header");
 
-        let linkedIn = "https://www.linkedin.com/feed/";
-
-        // login with cookies
-        let loggedIn;
-
-        if (cookies) {
-            // set users auth cookies
-            await page.setCookie({
-                name: "li_at",
-                value: `${cookie}`,
-                domain: "www.linkedin.com",
-            });
-
-            try {
-                await page.goto(linkedIn, { waitUntil: "networkidle0" });
-                httpRequestCount++;
-
-                // wait for element
-                let messageBar = "header.msg-overlay-bubble-header";
-                await page.waitForSelector(messageBar);
-            } catch (error) {
+            if (page.url().contains("linkedin.com/feed")) {
+                console.log("SUCCESSFULLY SET COOKIES");
+                loggedIn = true;
+            } else {
                 console.log("COOKIES HAVE EXPIRED. REPLACE COOKIES AND TRY AGAIN!!");
-                loggedIn = false;
             }
-        } else {
-            console.log("NEED COOKIES!!!");
-            loggedIn = false;
+        } catch (error) {
+            console.log("ERROR NAVIGATING TO WWW.LINKEDIN.COM");
         }
 
         while (loggedIn) {
-            // Check how to run the script (initial, update, resume)
-            // scriptMode =
+            let scriptMode = await checkScriptMode();
 
             if (!scriptMode) {
                 break;
@@ -171,7 +121,7 @@ let httpRequestCount = 0;
             // export scraped contacts
             await exportData(allContactsData, scriptMode);
 
-            if (httpRequestCount > 80) {
+            if (httpRequestCount >= httpRequestMax) {
                 loggedIn = false;
             } else if (scriptMode === "Resume") {
                 loggedIn = false;
@@ -182,12 +132,6 @@ let httpRequestCount = 0;
         await browser.close();
         console.log("Browser closed");
     } catch (error) {
-        console.log(`LINKEDINSCRAPER.JS ERROR --- ${error}`);
-
-        // take screenshot to analyze problem
-        await page.screenshot({ path: "./image.jpg", type: "jpeg" });
-
-        // export scraped contacts
-        await exportData(allContactsData, scriptMode);
+        console.log(`INDEX.JS ERROR --- ${error}`);
     }
 })();

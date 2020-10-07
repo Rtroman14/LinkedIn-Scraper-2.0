@@ -13,7 +13,6 @@ const userSchema = new Schema({
     cookieStatus: { type: Boolean, default: false },
     proxyUsername: String,
     proxyPassword: String,
-    httpRequestCount: { type: Number, default: 0 },
 });
 
 // "users" = collection name
