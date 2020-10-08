@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 const { Schema } = mongoose;
 
-const contactSchema = new Schema({
+const profileSchema = new Schema({
     firstName: String,
     lastName: String,
     job: String,
@@ -14,5 +14,4 @@ const contactSchema = new Schema({
     birthday: String,
 });
 
-// "contact" = collection name
-mongoose.model("contact", contactSchema);
+mongoose.model("profile", profileSchema);

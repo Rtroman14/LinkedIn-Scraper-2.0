@@ -6,21 +6,29 @@ const puppeteer = require("puppeteer"),
     scrapeContacts = require("./src/scrapeContacts"),
     configBrowser = require("./src/configBrowser");
 
-require("./src/mongoDB/models/Users");
+require("./src/mongoDB/models/User");
 require("./src/mongoDB/models/Connections");
 
 let { username, password, cookie, base, projectName } = accounts.users.tylerFreilinger;
 
 const mongoose = require("mongoose");
-mongoose.connect(keys.mongoURI, { useNewUrlParser: true, useUnifiedTopology: true });
+mongoose.connect(process.env.MONGO_DB, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+    useFindAndModify: false,
+});
+
+const connection = mongoose.connection;
+
+connection.once("open", function () {
+    console.log("MongoDB database connection established successfully");
+});
 
 let httpRequestCount = 0;
 let httpRequestMax = Math.floor(Math.random() * (80 - 68)) + 68;
 
 // login with cookies
 let loggedIn = false;
-
-// ON AIRTABLE BRANCH !!!
 
 (async () => {
     try {

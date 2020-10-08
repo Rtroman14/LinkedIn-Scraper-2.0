@@ -2,8 +2,8 @@ const mongoose = require("mongoose");
 const { Schema } = mongoose;
 
 const userSchema = new Schema({
-    client: { type: String, default: "" },
-    lastRun: { type: Date, default: Date.now },
+    client: String,
+    lastRun: Date,
     airtable: {
         base: String,
         projectName: String,
@@ -13,6 +13,7 @@ const userSchema = new Schema({
     cookieStatus: { type: Boolean, default: false },
     proxyUsername: String,
     proxyPassword: String,
+    scriptMode: { type: String, default: "Initial" },
 });
 
 // "users" = collection name
