@@ -81,19 +81,17 @@ class MongoDB {
             return console.log(`COULD NOT FIND USER: ${client}`);
         });
 
-        if (account) {
-            const existingConnection = await Connection.findOne({ _user: account._id });
+        const existingConnection = await Connection.findOne({ _user: account._id });
 
-            const nextConnection = existingConnection.connections.$pop();
+        const nextConnection = existingConnection.connections.$pop();
 
-            existingConnection.save((error) => {
-                if (error) {
-                    return console.log("SAVE ERROR ---", error);
-                }
-            });
+        existingConnection.save((error) => {
+            if (error) {
+                return console.log("SAVE ERROR ---", error);
+            }
+        });
 
-            return nextConnection;
-        }
+        return nextConnection;
     }
 }
 
