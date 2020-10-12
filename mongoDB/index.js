@@ -96,3 +96,50 @@ class MongoDB {
 }
 
 module.exports = new MongoDB();
+
+// (async () => {
+// const newUser = {
+//     client: "Ryan Roman 1",
+//     lastRun: Date.now(),
+//     airtable: {
+//         base: "aslkng8432",
+//         projectName: "Linkedin",
+//         baseName: "Base",
+//     },
+//     cookie: "asleninrha89w49vasr",
+//     cookieStatus: false,
+//     proxyUsername: "proxyUsername",
+//     proxyPassword: "proxyPassword",
+//     scriptMode: "Initial",
+// };
+// await mongoDB.createUser(newUser).then((user) => console.log(`Created new user: ${user.client}`));
+// ---------------------------------------
+// await mongoDB.updateUserField("Ryan Roman 1", {
+//     proxyUsername: "proxyUsername",
+//     proxyPassword: "proxyPassword",
+// });
+// ---------------------------------------
+// const newContact = {
+//     firstName: "Ryan Roman 2",
+//     lastName: "Roman",
+//     profileUrl: "https://www.linkedin.com/rtoman14",
+// };
+// await mongoDB.addConnection("Ryan Roman 1", newContact);
+// ---------------------------------------
+// const newProfile = {
+//     firstName: "Ryan 1",
+//     lastName: "Roman",
+//     job: "Web Developer",
+//     city: "Broomfield",
+//     company: "Summa Media",
+//     email: "Ryan@summamedia.co",
+//     phone: "715-252-9999",
+//     profileUrl: "https://www.linkedin.com/rtroman14",
+//     connected: "November 3, 2019",
+//     birthday: "September 15",
+// };
+// await mongoDB.addProfile("Ryan Roman 1", newProfile);
+// ---------------------------------------
+// const nextUser = await mongoDB.getNextConnection("Ryan Roman 1");
+// nextUser ? console.log(nextUser) : console.log("NO USER");
+// })();
