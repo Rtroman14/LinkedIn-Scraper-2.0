@@ -14,21 +14,9 @@ let httpRequestCount = 0;
 
 (async () => {
     try {
-        const browser = await puppeteer.launch({
-            headless: true,
-            args: [
-                // "--proxy-server=zproxy.lum-superproxy.io:22225",
-                // "--no-sandbox",
-                // "--disable-setuid-sandbox",
-                // "--disable-dev-shm-usage",
-                // "--disable-gpu",
-            ],
-        });
+        const browser = await puppeteer.launch({ headless: true });
         const page = await browser.newPage();
-        // await page.authenticate({
-        //     username: proxyUsername,
-        //     password: proxyPassword,
-        // });
+
         await page.setViewport({ width: 1366, height: 768 });
 
         // turns request interceptor on
