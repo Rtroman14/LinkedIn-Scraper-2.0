@@ -1,9 +1,11 @@
+const airtableCreate = require("./src/airtable");
+
 let allContacts = {
     httpRequestCount: 80,
     contacts: [],
 };
 
-module.exports = async (page, contacts, httpRequestCount) => {
+module.exports = async (page, contacts, httpRequestCount, projectName) => {
     try {
         let allContactsData = {
             httpRequestCount: "",
@@ -88,6 +90,25 @@ module.exports = async (page, contacts, httpRequestCount) => {
 
                     return contactObj;
                 }, contact);
+
+                const record = {
+                    "First Name": contactData.firstName,
+                    "Last Name": contactData.lastName,
+                    Job: contactData.job,
+                    City: contactData.city,
+                    Company: contactData.company,
+                    Email: contactData.email,
+                    "Phone Number": contactData.phone,
+                    "LinkedIn Page": contactData.profile,
+                    "Date Connected": contactData.connected,
+                    Birthday: contactData.birthday,
+                };
+
+                try {
+                    await airtableCreate(projectName, record);
+                } catch (error) {
+                    console.log("ERROR ADDING CONTACT TO AIRTABLE");
+                }
 
                 allContactsData.contacts.push(contactData);
                 allContacts.contacts.push(contactData); // incase failure
