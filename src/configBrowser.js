@@ -1,12 +1,13 @@
-module.exports = async (page) => {
+module.exports = async (page, linkedinAccount) => {
     try {
+        const { proxyUsername, proxyPassword, cookie } = linkedinAccount;
+
         await page.authenticate({
             username: proxyUsername,
             password: proxyPassword,
         });
 
         await page.setViewport({ width: 1366, height: 768 });
-        // turns request interceptor on
 
         await page.setRequestInterception(true);
 
@@ -24,7 +25,7 @@ module.exports = async (page) => {
         });
 
         // authenticate user
-        await page.setCookie({ name: "li_at", value: "[cookie here]", domain: "www.linkedin.com" });
+        await page.setCookie({ name: "li_at", value: cookie, domain: "www.linkedin.com" });
     } catch (error) {
         console.log(`BROWSER CONFIGURATION ERROR --- ${error}`);
     }

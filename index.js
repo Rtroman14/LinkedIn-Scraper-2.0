@@ -1,17 +1,15 @@
-const puppeteer = require("puppeteer"),
-    accounts = require("./accounts"),
-    { scriptType } = require("./src/scriptType"),
-    login = require("./src/login"),
-    scrollPage = require("./src/scrollPage"),
-    scrapeContacts = require("./src/scrapeContacts"),
-    configBrowser = require("./src/configBrowser");
+require("dotenv").config();
 
-require("./src/mongoDB/models/User");
-require("./src/mongoDB/models/Connections");
-
-let { username, password, cookie, base, projectName } = accounts.users.tylerFreilinger;
-
+const puppeteer = require("puppeteer");
+const scrollPage = require("./src/scrollPage");
+const scrapeContacts = require("./src/scrapeContacts");
+const configBrowser = require("./src/configBrowser");
 const mongoose = require("mongoose");
+const moment = require("moment");
+
+require("./mongoDB/models/User");
+require("./mongoDB/models/Connections");
+
 mongoose.connect(process.env.MONGO_DB, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
@@ -20,17 +18,32 @@ mongoose.connect(process.env.MONGO_DB, {
 
 const connection = mongoose.connection;
 
-connection.once("open", function () {
+connection.once("open", () => {
     console.log("MongoDB database connection established successfully");
 });
+
+const User = mongoose.model("users");
+const linkedinAccount = await User.findOne({ client: "Ryan Roman 1" });
 
 let httpRequestCount = 0;
 let httpRequestMax = Math.floor(Math.random() * (80 - 68)) + 68;
 
+const lastRunTime = linkedinAccount.lastRun.split("T")[0];
+const yesterday = moment().subtract(1, "days").format("YYYY-MM-DD");
+
+console.log({ lastRunTime });
+console.log({ yesterday });
+
+console.log(lastRunTime < yesterday);
+
 // login with cookies
 let loggedIn = false;
 
-(async () => {
+if (lastRunTime < yesterday) {
+    await scrapeLinkedin();
+}
+
+const scrapeLinkedin = async () => {
     try {
         const browser = await puppeteer.launch({
             headless: false,
@@ -45,7 +58,7 @@ let loggedIn = false;
 
         const page = await browser.newPage();
 
-        await configBrowser(page);
+        await configBrowser(page, linkedinAccount);
 
         try {
             await page.goto("https://www.linkedin.com/feed/", { waitUntil: "networkidle0" });
@@ -140,6 +153,10 @@ let loggedIn = false;
         await browser.close();
         console.log("Browser closed");
     } catch (error) {
+        // close browser
+        await browser.close();
+        console.log("Browser closed");
+
         console.log(`INDEX.JS ERROR --- ${error}`);
     }
-})();
+};
