@@ -6,7 +6,7 @@ const puppeteer = require("puppeteer"),
     scrapeContacts = require("./src/scrapeContacts"),
     exportData = require("./src/exportData");
 
-const { username, password, proxyUsername, proxyPassword, wksht } = accounts.users.tylerFreilinger;
+const { username, password, wksht } = accounts.users.tylerFreilinger;
 
 let googleSheet;
 
