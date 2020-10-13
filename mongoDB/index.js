@@ -26,62 +26,80 @@ class MongoDB {
         return user;
     }
 
-    async updateUserField(client, attributes) {
-        await User.findOne({ client }, async (err, user) => {
-            if (user) {
-                return await User.findByIdAndUpdate(
-                    user._id,
-                    attributes,
-                    { new: true },
-                    (err, updatedUser) => {
-                        if (err) {
-                            console.log("ERROR UPDATED USER FIELD ---", err);
-                        }
+    async getUser(client) {
+        try {
+            return await User.findOne({ client });
+        } catch (error) {
+            console.log(`ERROR RETRIEVING USER: ${client} --- ${error}`);
+        }
+    }
 
-                        console.log("Updated user =", updatedUser);
+    async updateUserField(client, attributes) {
+        const user = await this.getUser(client);
+
+        if (user) {
+            return await User.findByIdAndUpdate(
+                user._id,
+                attributes,
+                { new: true },
+                (err, updatedUser) => {
+                    if (err) {
+                        console.log("ERROR UPDATED USER FIELD ---", err);
                     }
-                );
-            } else {
-                console.log(`COULD NOT FIND USER: ${client}`);
-            }
-        });
+
+                    console.log("Updated user =", updatedUser);
+                }
+            );
+        } else {
+            console.log(`COULD NOT FIND USER: ${client}`);
+        }
     }
 
     async addConnection(client, contact) {
-        await User.findOne({ client }, async (err, user) => {
-            if (user) {
-                const existingConnection = await Connection.findOne({ _user: user._id });
+        const user = await this.getUser(client);
 
-                await existingConnection.connections.push(contact);
-                return await existingConnection.save();
-            }
+        if (user) {
+            const existingConnection = await Connection.findOne({ _user: user._id });
 
+            await existingConnection.connections.push(contact);
+            return await existingConnection.save();
+        } else {
             console.log(`COULD NOT FIND USER: ${client}`);
-        });
+        }
+    }
+
+    async addConnections(client, contacts) {
+        const user = await this.getUser(client);
+
+        if (user) {
+            const existingConnection = await Connection.findOne({ _user: user._id });
+
+            for (let contact of contacts) {
+                await existingConnection.connections.push(contact);
+            }
+            return await existingConnection.save();
+        } else {
+            console.log(`COULD NOT FIND USER: ${client}`);
+        }
     }
 
     async addProfile(client, profile) {
-        await User.findOne({ client }, async (err, user) => {
-            if (user) {
-                const existingConnection = await Connection.findOne({ _user: user._id });
+        const user = await this.getUser(client);
 
-                await existingConnection.connectionsData.push(profile);
-                return await existingConnection.save();
-            }
+        if (user) {
+            const existingConnection = await Connection.findOne({ _user: user._id });
 
+            await existingConnection.connectionsData.push(profile);
+            return await existingConnection.save();
+        } else {
             console.log(`COULD NOT FIND USER: ${client}`);
-        });
+        }
     }
 
     async getNextConnection(client) {
-        const account = await User.findOne({ client }, async (err, user) => {
-            if (user) {
-                return user;
-            }
-            return console.log(`COULD NOT FIND USER: ${client}`);
-        });
+        const user = await this.getUser(client);
 
-        const existingConnection = await Connection.findOne({ _user: account._id });
+        const existingConnection = await Connection.findOne({ _user: user._id });
 
         const nextConnection = existingConnection.connections.$pop();
 
@@ -92,6 +110,24 @@ class MongoDB {
         });
 
         return nextConnection;
+    }
+
+    async getLastTwoConnections(client) {
+        const user = await this.getUser(client);
+
+        if (user) {
+            let connections = [];
+
+            const existingConnection = await Connection.findOne({ _user: user._id });
+
+            // const nextConnection = existingConnection.connections.$pop();
+
+            const nextConnections = existingConnection.connections.slice(-2);
+
+            return nextConnections;
+        } else {
+            return console.log(`COULD NOT FIND USER: ${client}`);
+        }
     }
 }
 

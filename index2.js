@@ -1,31 +1,15 @@
 require("dotenv").config();
 
 const puppeteer = require("puppeteer");
-const mongoose = require("mongoose");
 const moment = require("moment");
 
 const scrollPage = require("./src/scrollPage");
 const scrapeContacts = require("./src/scrapeContacts");
 const configBrowser = require("./src/configBrowser");
 const checkAuthentication = require("./src/checkAuthentication");
+const MongoDB = require("./mongoDB/index");
 
-require("./mongoDB/models/User");
-require("./mongoDB/models/Connections");
-
-mongoose.connect(process.env.MONGO_DB, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-    useFindAndModify: false,
-});
-
-const connection = mongoose.connection;
-
-connection.once("open", () => {
-    console.log("MongoDB database connection established successfully");
-});
-
-const User = mongoose.model("users");
-const user = await User.findOne({ client: "Ryan Roman 1" });
+const user = await MongoDB.getUser("Ryan Roman 1");
 
 let httpRequestCount = 0;
 let httpRequestMax = Math.floor(Math.random() * (80 - 68)) + 68;
@@ -61,6 +45,21 @@ const scrapeLinkedin = async () => {
 
         let loggedIn = await checkAuthentication(page);
         httpRequestCount++;
+
+        while (loggedIn) {
+            let scriptMode = user.scriptMode;
+            console.log({ scriptMode });
+
+            if (scriptMode !== "Resume") {
+                // navigate to connections page
+                await page.goto("https://www.linkedin.com/mynetwork/invite-connect/connections/", {
+                    waitUntil: "networkidle2",
+                });
+                httpRequestCount++;
+
+                await scrollPage(page, user);
+            }
+        }
 
         while (loggedIn) {
             let scriptMode = user.scriptMode;

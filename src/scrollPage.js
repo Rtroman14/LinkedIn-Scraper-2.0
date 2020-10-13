@@ -1,17 +1,27 @@
-module.exports = async (page, googleSheet) => {
-    let scriptMode = googleSheet.scriptMode;
-    let lastContact = googleSheet.lastContact;
-    let secondLastContact = googleSheet.secondLastContact;
+const MongoDB = require("../mongoDB/index");
 
+module.exports = async (page, user) => {
     try {
+        const { client, scriptMode } = user;
+
         let previousHeight = 0;
         let currentHeight = await page.evaluate("document.scrollingElement.scrollHeight");
         let total = 0;
+        let lastContact;
+        let secondLastContact;
+
+        if (scriptMode === "Update") {
+            let lastConnections = await MongoDB.getLastTwoConnections(client);
+
+            lastContact = lastConnections[1].email;
+            secondLastContact = lastConnections[0].email;
+        }
 
         while (previousHeight < currentHeight) {
+            previousHeight = await page.evaluate("document.scrollingElement.scrollHeight");
             console.log("Scrolling...");
             total++;
-            previousHeight = await page.evaluate("document.scrollingElement.scrollHeight");
+
             await scroll(page, previousHeight);
 
             // scroll step up to load contacts list
@@ -23,14 +33,9 @@ module.exports = async (page, googleSheet) => {
 
             // return list of updated contacts
             if (scriptMode === "Update") {
-                let contacts = await page.evaluate(extractContactUrls);
+                const newConnections = await page.evaluate(checkForScrapedContact);
 
-                // break while loop if lastContact in DOM
-                for (let i = 0; i < contacts.length; i++) {
-                    if (contacts[i] === (lastContact || secondLastContact)) {
-                        return contacts.splice(0, i);
-                    }
-                }
+                await MongoDB.addConnections(client, newConnections);
             }
 
             currentHeight = await page.evaluate("document.scrollingElement.scrollHeight");
@@ -39,20 +44,41 @@ module.exports = async (page, googleSheet) => {
         // return all contacts
         return await page.evaluate(extractContactUrls);
     } catch (error) {
-        console.log(`Scroll error = ${error}`);
+        console.log(`SCROLLING ERROR --- ${error}`);
     }
 };
 
-let extractContactUrls = () => {
-    let contactUrls = [];
-    let contacts = document.querySelectorAll(".mn-connection-card__details > a");
-    for (let contact of contacts) {
-        contactUrls.push(contact.href);
+const checkForScrapedContact = () => {
+    const connections = document.querySelectorAll(".mn-connection-card__details > a");
+
+    const foundScrapedContact = false;
+
+    for (let connection of connections) {
+        if (connection.href === (lastContact || secondLastContact)) {
+            foundScrapedContact = true;
+        }
     }
-    return contactUrls;
+
+    if (foundScrapedContact) {
+        let newConnections = [];
+        let contact = {};
+
+        for (let connection of connections) {
+            const name = connection.querySelector(".mn-connection-card__name").innerText;
+
+            if (connection.href !== (lastContact || secondLastContact)) {
+                contact.name = name;
+                contact.profileUrl = connection.href;
+
+                newConnections.push(contact);
+            }
+
+            return newConnections;
+        }
+    }
 };
 
-let scroll = async (page, amount) => {
+const scroll = async (page, amount) => {
     await page.evaluate(`window.scrollBy({
         top: ${amount},
         behavior: "smooth",
