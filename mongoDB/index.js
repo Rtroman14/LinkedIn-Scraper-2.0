@@ -116,15 +116,9 @@ class MongoDB {
         const user = await this.getUser(client);
 
         if (user) {
-            let connections = [];
-
             const existingConnection = await Connection.findOne({ _user: user._id });
 
-            // const nextConnection = existingConnection.connections.$pop();
-
-            const nextConnections = existingConnection.connections.slice(-2);
-
-            return nextConnections;
+            return existingConnection.connections.slice(-2);
         } else {
             return console.log(`COULD NOT FIND USER: ${client}`);
         }
