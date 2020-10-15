@@ -14,6 +14,7 @@ const userSchema = new Schema({
     proxyUsername: String,
     proxyPassword: String,
     scriptMode: { type: String, default: "Initial" },
+    httpRequestCount: { type: Number, default: 0 },
 });
 
 // "users" = collection name

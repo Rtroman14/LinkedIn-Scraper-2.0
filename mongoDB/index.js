@@ -34,6 +34,16 @@ class MongoDB {
         }
     }
 
+    async getUserConnection(client) {
+        try {
+            const user = await this.getUser(client);
+
+            return await Connection.findOne({ _user: user._id });
+        } catch (error) {
+            console.log(`ERROR RETRIEVING USER'S CONNECTIONS: ${client} --- ${error}`);
+        }
+    }
+
     async updateUserField(client, attributes) {
         const user = await this.getUser(client);
 
@@ -56,72 +66,67 @@ class MongoDB {
     }
 
     async addConnection(client, contact) {
-        const user = await this.getUser(client);
-
-        if (user) {
-            const existingConnection = await Connection.findOne({ _user: user._id });
+        try {
+            const existingConnection = await this.getUserConnection(client);
 
             await existingConnection.connections.push(contact);
-            return await existingConnection.save();
-        } else {
-            console.log(`COULD NOT FIND USER: ${client}`);
-        }
-    }
+            await existingConnection.save();
 
-    async addConnections(client, contacts) {
-        const user = await this.getUser(client);
-
-        if (user) {
-            const existingConnection = await Connection.findOne({ _user: user._id });
-
-            for (let contact of contacts) {
-                await existingConnection.connections.push(contact);
-            }
-            return await existingConnection.save();
-        } else {
-            console.log(`COULD NOT FIND USER: ${client}`);
+            return;
+        } catch (error) {
+            console.log("ERROR ADDING CONNECTION ---", error);
         }
     }
 
     async addProfile(client, profile) {
-        const user = await this.getUser(client);
-
-        if (user) {
-            const existingConnection = await Connection.findOne({ _user: user._id });
+        try {
+            const existingConnection = await this.getUserConnection(client);
 
             await existingConnection.connectionsData.push(profile);
-            return await existingConnection.save();
-        } else {
-            console.log(`COULD NOT FIND USER: ${client}`);
+            await existingConnection.save();
+
+            console.log(`Scraped ${profile.profileUrl}`);
+
+            return;
+        } catch (error) {
+            console.log("ERROR ADDING PROFILE ---", error);
         }
     }
 
     async getNextConnection(client) {
-        const user = await this.getUser(client);
+        try {
+            const existingConnection = await this.getUserConnection(client);
 
-        const existingConnection = await Connection.findOne({ _user: user._id });
+            const nextConnection = existingConnection.connections.$pop();
 
-        const nextConnection = existingConnection.connections.$pop();
+            existingConnection.save();
 
-        existingConnection.save((error) => {
-            if (error) {
-                return console.log("SAVE ERROR ---", error);
-            }
-        });
+            return nextConnection.profileUrl;
+        } catch (error) {
+            console.log("ERROR GETTING NEXT CONNECTION ---", error);
 
-        return nextConnection;
+            return false;
+        }
     }
 
     async getLastTwoConnections(client) {
-        const user = await this.getUser(client);
-
-        if (user) {
-            const existingConnection = await Connection.findOne({ _user: user._id });
+        try {
+            const existingConnection = await this.getUserConnection(client);
 
             return existingConnection.connections.slice(-2);
-        } else {
-            return console.log(`COULD NOT FIND USER: ${client}`);
+        } catch (error) {
+            console.log("ERROR GETTING LAST TWO CONNECTIONS ---", error);
         }
+    }
+
+    async incrementHttpRequestCount(client) {
+        const user = await this.getUser(client);
+
+        await user.httpRequestCount++;
+
+        await user.save();
+
+        return user.httpRequestCount;
     }
 }
 

@@ -1,5 +1,9 @@
 const MongoDB = require("../mongoDB/index");
+const mongoose = require("mongoose");
+
 const { checkForScrapedContact, getAllContacts, scroll } = require("./helpers");
+
+const Contact = mongoose.model("contact");
 
 module.exports = async (page, user) => {
     try {
@@ -38,7 +42,12 @@ module.exports = async (page, user) => {
                 const newConnections = await page.evaluate(checkForScrapedContact);
 
                 if (newConnections) {
-                    await MongoDB.addConnections(client, newConnections);
+                    for (let connection of newConnections) {
+                        const contact = new Contact(connection);
+
+                        await MongoDB.addConnection(client, contact);
+                    }
+
                     return;
                 }
             }

@@ -60,4 +60,8 @@ module.exports = {
             console.log("SCROLL ERROR ---", error);
         }
     },
+
+    randomWait() {
+        return Math.floor(Math.random() * 10000 + 10000);
+    },
 };
