@@ -7,9 +7,10 @@ const scrollPage = require("./src/scrollPage");
 const scrapeContact = require("./src/scrapeContact");
 const configBrowser = require("./src/configBrowser");
 const checkAuthentication = require("./src/checkAuthentication");
-const { randomWait } = require("./src/helpers");
+const { randomWait, convertToAirtableRecord } = require("./src/helpers");
 
 const MongoDB = require("./mongoDB/index");
+const AirtableClass = require("./src/airtable");
 
 const user = await MongoDB.getUser("Ryan Roman 1");
 const { client } = user;
@@ -84,9 +85,19 @@ const scrapeLinkedin = async () => {
                 if (page.url() !== "https://www.linkedin.com/in/unavailable/") {
                     let contactProfile = await page.evaluate(scrapeContact);
 
-                    await MongoDB.addProfile(client, contactProfile);
+                    let contactProfileAirtable = convertToAirtableRecord(contactProfile);
 
-                    // ADD CONTACTPROFILE TO AIRTABLE
+                    let airtableRecordID = await AirtableClass.createRecord(
+                        client,
+                        contactProfileAirtable
+                    );
+
+                    let contactProfileMongoDB = {
+                        ...contactProfile,
+                        airtableRecordID,
+                    };
+
+                    await MongoDB.addProfile(client, contactProfileMongoDB);
                 }
 
                 let httpCount = await MongoDB.incrementHttpRequestCount(client);

@@ -4,11 +4,6 @@ const { Schema } = mongoose;
 const userSchema = new Schema({
     client: String,
     lastRun: Date,
-    airtable: {
-        base: String,
-        projectName: String,
-        baseName: String,
-    },
     cookie: String,
     cookieStatus: { type: Boolean, default: false },
     proxyUsername: String,

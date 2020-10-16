@@ -12,6 +12,7 @@ const profileSchema = new Schema({
     profileUrl: String,
     connected: String,
     birthday: String,
+    airtableRecordID: { type: String, default: "" },
 });
 
 mongoose.model("profile", profileSchema);

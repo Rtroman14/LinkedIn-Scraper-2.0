@@ -64,4 +64,19 @@ module.exports = {
     randomWait() {
         return Math.floor(Math.random() * 10000 + 10000);
     },
+
+    convertToAirtableRecord(contactProfile) {
+        return {
+            "First Name": contactProfile.firstName,
+            "Last Name": contactProfile.lastName,
+            Job: contactProfile.job,
+            City: contactProfile.city,
+            Company: contactProfile.company,
+            Email: contactProfile.email,
+            "Phone Number": contactProfile.phone,
+            "LinkedIn Page": contactProfile.profileUrl,
+            "Date Connected": contactProfile.connected,
+            Birthday: contactProfile.birthday,
+        };
+    },
 };

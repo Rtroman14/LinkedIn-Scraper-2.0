@@ -1,0 +1,25 @@
+STRUCTURE DATABASE AS AN OBJECT OF OBJECTS WITH PROFILEURL AS KEY TO EACH PROFILE OBJECT
+
+
+QUESTIONS
+--------------
+
+1. WHAT PROPERTIES SHOULD PROFILEURL HAVE?
+    - MEETING? - no
+    - 
+2. WILL I EVER HAVE TO QUERY A PROFILE?
+    - TO UPDATE A PROPERTY. MEETING? - no
+    - TO UPDATE COOKIE OR COOKIE STATUS
+
+
+
+firstName
+lastName
+job
+city
+company
+email
+phone
+profileUrl
+connected
+birthday

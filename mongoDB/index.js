@@ -3,9 +3,13 @@ require("dotenv").config();
 const mongoose = require("mongoose");
 
 require("./models/User");
+require("./models/Contact");
+require("./models/Profile");
 require("./models/Connections");
 
 const User = mongoose.model("users");
+const Profile = mongoose.model("profile");
+const Contact = mongoose.model("contact");
 const Connection = mongoose.model("connections");
 
 mongoose.connect(process.env.MONGO_DB, {
@@ -69,7 +73,9 @@ class MongoDB {
         try {
             const existingConnection = await this.getUserConnection(client);
 
-            await existingConnection.connections.push(contact);
+            const newContact = new Contact(contact);
+
+            await existingConnection.connections.push(newContact);
             await existingConnection.save();
 
             return;
@@ -82,7 +88,9 @@ class MongoDB {
         try {
             const existingConnection = await this.getUserConnection(client);
 
-            await existingConnection.connectionsData.push(profile);
+            const newProfile = new Profile(profile);
+
+            await existingConnection.connectionsData.push(newProfile);
             await existingConnection.save();
 
             console.log(`Scraped ${profile.profileUrl}`);
