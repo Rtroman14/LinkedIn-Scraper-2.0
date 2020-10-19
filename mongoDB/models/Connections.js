@@ -6,7 +6,7 @@ const ProfileSchema = require("./Contact");
 const connectionSchema = new Schema({
     _user: { type: Schema.Types.ObjectId, ref: "User" },
     account: String,
-    connectionsData: [ProfileSchema],
+    connectionsProfile: [ProfileSchema],
     connections: [ContactSchema],
 });
 

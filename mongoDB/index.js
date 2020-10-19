@@ -1,5 +1,7 @@
 require("dotenv").config();
 
+const { mapKeys } = require("lodash");
+
 const mongoose = require("mongoose");
 
 require("./models/User");
@@ -84,22 +86,45 @@ class MongoDB {
         }
     }
 
-    async addProfile(client, profile) {
-        try {
-            const existingConnection = await this.getUserConnection(client);
+    // async addProfile(client, profile) {
+    //     try {
+    //         const existingConnection = await this.getUserConnection(client);
 
-            const newProfile = new Profile(profile);
+    //         const newProfile = new Profile(profile);
 
-            await existingConnection.connectionsData.push(newProfile);
-            await existingConnection.save();
+    //         const normalizedProfile = mapKeys(newProfile, "profileUrl");
 
-            console.log(`Scraped ${profile.profileUrl}`);
+    //         const connectionProfiles = await existingConnection.connectionsProfile;
 
-            return;
-        } catch (error) {
-            console.log("ERROR ADDING PROFILE ---", error);
-        }
-    }
+    //         const allConnectionProfiles = { ...connectionProfiles, ...normalizedProfile };
+
+    //         await existingConnection.connectionsProfile = allConnectionProfiles;
+    //         await existingConnection.save();
+
+    //         console.log(`Scraped ${profile.profileUrl}`);
+
+    //         return;
+    //     } catch (error) {
+    //         console.log("ERROR ADDING PROFILE ---", error);
+    //     }
+    // }
+
+    // async addProfile(client, profile) {
+    //     try {
+    //         const existingConnection = await this.getUserConnection(client);
+
+    //         const newProfile = new Profile(profile);
+
+    //         await existingConnection.connectionsProfile.push(newProfile);
+    //         await existingConnection.save();
+
+    //         console.log(`Scraped ${profile.profileUrl}`);
+
+    //         return;
+    //     } catch (error) {
+    //         console.log("ERROR ADDING PROFILE ---", error);
+    //     }
+    // }
 
     async getNextConnection(client) {
         try {
