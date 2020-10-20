@@ -6,7 +6,7 @@ const puppeteer = require("puppeteer"),
     scrapeContacts = require("./src/scrapeContacts"),
     exportData = require("./src/exportData");
 
-const { username, password, wksht } = accounts.users.paulPendy;
+const { username, password, wksht } = accounts.users.tylerFreilinger;
 
 let googleSheet;
 
@@ -14,7 +14,7 @@ let httpRequestCount = 0;
 
 (async () => {
     try {
-        const browser = await puppeteer.launch({ headless: false });
+        const browser = await puppeteer.launch({ headless: true });
         const page = await browser.newPage();
 
         await page.setViewport({ width: 1366, height: 768 });
