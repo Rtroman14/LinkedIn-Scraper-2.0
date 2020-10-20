@@ -86,45 +86,22 @@ class MongoDB {
         }
     }
 
-    // async addProfile(client, profile) {
-    //     try {
-    //         const existingConnection = await this.getUserConnection(client);
+    async addProfile(client, profile) {
+        try {
+            const existingConnection = await this.getUserConnection(client);
 
-    //         const newProfile = new Profile(profile);
+            const newProfile = new Profile(profile);
 
-    //         const normalizedProfile = mapKeys(newProfile, "profileUrl");
+            await existingConnection.connectionsProfile.push(newProfile);
+            await existingConnection.save();
 
-    //         const connectionProfiles = await existingConnection.connectionsProfile;
+            console.log(`Scraped ${profile.profileUrl}`);
 
-    //         const allConnectionProfiles = { ...connectionProfiles, ...normalizedProfile };
-
-    //         await existingConnection.connectionsProfile = allConnectionProfiles;
-    //         await existingConnection.save();
-
-    //         console.log(`Scraped ${profile.profileUrl}`);
-
-    //         return;
-    //     } catch (error) {
-    //         console.log("ERROR ADDING PROFILE ---", error);
-    //     }
-    // }
-
-    // async addProfile(client, profile) {
-    //     try {
-    //         const existingConnection = await this.getUserConnection(client);
-
-    //         const newProfile = new Profile(profile);
-
-    //         await existingConnection.connectionsProfile.push(newProfile);
-    //         await existingConnection.save();
-
-    //         console.log(`Scraped ${profile.profileUrl}`);
-
-    //         return;
-    //     } catch (error) {
-    //         console.log("ERROR ADDING PROFILE ---", error);
-    //     }
-    // }
+            return;
+        } catch (error) {
+            console.log("ERROR ADDING PROFILE ---", error);
+        }
+    }
 
     async getNextConnection(client) {
         try {
@@ -160,6 +137,16 @@ class MongoDB {
         await user.save();
 
         return user.httpRequestCount;
+    }
+
+    async findProfile(client, profile) {
+        try {
+            const existingConnection = await this.getUserConnection(client);
+
+            return await existingConnection.connections.pull(profile);
+        } catch (error) {
+            console.log("ERROR FINDING ONE ---", error);
+        }
     }
 }
 
