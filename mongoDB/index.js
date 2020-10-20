@@ -14,12 +14,6 @@ const Profile = mongoose.model("profile");
 const Contact = mongoose.model("contact");
 const Connection = mongoose.model("connections");
 
-mongoose.connect(process.env.MONGO_DB, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-    useFindAndModify: false,
-});
-
 class MongoDB {
     async createUser(newUser) {
         const user = await new User(newUser).save();

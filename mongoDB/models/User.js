@@ -5,7 +5,7 @@ const userSchema = new Schema({
     client: String,
     lastRun: Date,
     cookie: String,
-    cookieStatus: { type: Boolean, default: false },
+    cookieStatus: { type: Boolean, default: true },
     proxyUsername: String,
     proxyPassword: String,
     scriptMode: { type: String, default: "Initial" },

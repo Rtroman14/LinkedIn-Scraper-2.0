@@ -57,7 +57,10 @@ module.exports = async (page, user) => {
 
         const newConnections = await page.evaluate(getAllContacts);
 
-        await MongoDB.addConnections(client, newConnections);
+        for (let newConnection of newConnections) {
+            await MongoDB.addConnection(client, newConnection);
+        }
+
         return;
     } catch (error) {
         console.log(`SCROLLING ERROR --- ${error}`);

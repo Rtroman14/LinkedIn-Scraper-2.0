@@ -2,10 +2,10 @@ module.exports = async (page, linkedinAccount) => {
     try {
         const { proxyUsername, proxyPassword, cookie } = linkedinAccount;
 
-        await page.authenticate({
-            username: proxyUsername,
-            password: proxyPassword,
-        });
+        // await page.authenticate({
+        //     username: proxyUsername,
+        //     password: proxyPassword,
+        // });
 
         await page.setViewport({ width: 1366, height: 768 });
 

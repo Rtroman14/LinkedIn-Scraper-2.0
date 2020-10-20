@@ -8,39 +8,58 @@ const scrapeContact = require("./src/scrapeContact");
 const configBrowser = require("./src/configBrowser");
 const checkAuthentication = require("./src/checkAuthentication");
 const { randomWait, convertToAirtableRecord } = require("./src/helpers");
-
-const MongoDB = require("./mongoDB/index");
 const AirtableClass = require("./src/airtable");
 
-const user = await MongoDB.getUser("Ryan Roman 1");
-const { client } = user;
-let { scriptMode } = user;
+const MongoDB = require("./mongoDB/index");
+const mongoose = require("mongoose");
+mongoose.connect(process.env.MONGO_DB, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+    useFindAndModify: false,
+});
+
+const account = "Ryan Roman";
+
+let user;
+let client;
+let scriptMode;
 
 let httpRequestMax = Math.floor(Math.random() * (80 - 68)) + 68;
 
-const lastRunTime = user.lastRun.split("T")[0];
-const yesterday = moment().subtract(1, "days").format("YYYY-MM-DD");
+(async () => {
+    try {
+        user = await MongoDB.getUser(account);
+        client = user.client;
+        scriptMode = user.scriptMode;
 
-if (lastRunTime < yesterday) {
-    await scrapeLinkedin();
-} else {
-    const nextRunDate = moment(lastRunTime, "YYYY-MM-DD").add(2, "days").format("LL");
-    console.log(
-        `To fly under LinkedIn's radar, please don't run the script on this account until ${nextRunDate}`
-    );
-}
+        const date = new Date(user.lastRun);
+        const lastRunTime = moment(date).format("YYYY-MM-DD");
+        const yesterday = moment().subtract(1, "days").format("YYYY-MM-DD");
+
+        if (lastRunTime < yesterday) {
+            await scrapeLinkedin();
+        } else {
+            const nextRunDate = moment(lastRunTime, "YYYY-MM-DD").add(2, "days").format("LL");
+            console.log(
+                `To fly under LinkedIn's radar, please don't run the script on this account until ${nextRunDate}`
+            );
+        }
+    } catch (error) {
+        console.log("ERROR INITIALIZING SCRIPT ---", error);
+    }
+})();
 
 const scrapeLinkedin = async () => {
     try {
         const browser = await puppeteer.launch({
             headless: false,
-            args: [
-                "--proxy-server=zproxy.lum-superproxy.io:22225",
-                // "--no-sandbox",
-                // "--disable-setuid-sandbox",
-                // "--disable-dev-shm-usage",
-                // "--disable-gpu",
-            ],
+            // args: [
+            //     "--proxy-server=zproxy.lum-superproxy.io:22225",
+            //     // "--no-sandbox",
+            //     // "--disable-setuid-sandbox",
+            //     // "--disable-dev-shm-usage",
+            //     // "--disable-gpu",
+            // ],
         });
 
         const page = await browser.newPage();

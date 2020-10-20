@@ -5,7 +5,7 @@ module.exports = async (page) => {
         // wait for element
         await page.waitForSelector("header.msg-overlay-bubble-header");
 
-        if (page.url().contains("linkedin.com/feed")) {
+        if (page.url().includes("linkedin.com/feed")) {
             console.log("SUCCESSFULLY SET COOKIES");
             return true;
         } else {
