@@ -1,125 +1,131 @@
-const puppeteer = require("puppeteer"),
-    accounts = require("./accounts"),
-    { scriptType } = require("./src/scriptType"),
-    login = require("./src/login"),
-    scrollPage = require("./src/scrollPage"),
-    scrapeContacts = require("./src/scrapeContacts"),
-    exportData = require("./src/exportData");
+require("dotenv").config();
 
-const { username, password, wksht } = accounts.users.paulPendy;
+const puppeteer = require("puppeteer");
+const moment = require("moment");
 
-let googleSheet;
+const scrollPage = require("./src/scrollPage");
+const scrapeContact = require("./src/scrapeContact");
+const configBrowser = require("./src/configBrowser");
+const checkAuthentication = require("./src/checkAuthentication");
+const { randomWait, convertToAirtableRecord } = require("./src/helpers");
+const AirtableClass = require("./src/airtable");
 
-let httpRequestCount = 0;
+const MongoDB = require("./mongoDB/index");
+const mongoose = require("mongoose");
+mongoose.connect(process.env.MONGO_DB, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+    useFindAndModify: false,
+});
+
+const account = "Ryan Roman";
+
+let user;
+let client;
+let scriptMode;
+
+let httpRequestMax = Math.floor(Math.random() * (80 - 68)) + 68;
 
 (async () => {
     try {
-        const browser = await puppeteer.launch({ headless: false });
-        const page = await browser.newPage();
+        user = await MongoDB.getUser(account);
+        client = user.client;
+        scriptMode = user.scriptMode;
 
-        await page.setViewport({ width: 1366, height: 768 });
+        const date = new Date(user.lastRun);
+        const lastRunTime = moment(date).format("YYYY-MM-DD");
+        const yesterday = moment().subtract(1, "days").format("YYYY-MM-DD");
 
-        // turns request interceptor on
-        await page.setRequestInterception(true);
+        if (lastRunTime < yesterday) {
+            await scrapeLinkedin();
+        } else {
+            const nextRunDate = moment(lastRunTime, "YYYY-MM-DD").add(2, "days").format("LL");
+            console.log(
+                `To fly under LinkedIn's radar, please don't run the script on this account until ${nextRunDate}`
+            );
+        }
+    } catch (error) {
+        console.log("ERROR INITIALIZING SCRIPT ---", error);
+    }
+})();
 
-        page.on("request", (request) => {
-            if (request.resourceType() === "image") {
-                request.abort();
-            } else {
-                request.continue();
-            }
+const scrapeLinkedin = async () => {
+    try {
+        const browser = await puppeteer.launch({
+            headless: false,
+            // args: [
+            //     "--proxy-server=zproxy.lum-superproxy.io:22225",
+            //     // "--no-sandbox",
+            //     // "--disable-setuid-sandbox",
+            //     // "--disable-dev-shm-usage",
+            //     // "--disable-gpu",
+            // ],
         });
 
-        // robot detection incognito - console.log(navigator.userAgent);
-        page.setUserAgent(
-            "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.125 Safari/537.36"
-        );
+        const page = await browser.newPage();
 
-        let linkedIn =
-            "https://www.linkedin.com/login?fromSignIn=true&trk=guest_homepage-basic_nav-header-signin";
+        await configBrowser(page, user);
 
-        try {
-            // navigate to linkedIn
-            await page.goto(linkedIn, { waitUntil: "networkidle2" });
-            httpRequestCount++;
-        } catch (error) {
-            console.log("Error while navigating to www.linkedin.com");
-        }
+        await MongoDB.updateUserField(client, { httpRequestCount: 0 });
 
-        // login
-        let loggedIn = await login(username, password, page);
+        let loggedIn = await checkAuthentication(page);
+        await MongoDB.incrementHttpRequestCount(client);
 
-        while (loggedIn) {
-            // Check how to run the script (initial, update, resume)
-            googleSheet = await scriptType(wksht, httpRequestCount);
-            scriptMode = googleSheet.scriptMode;
-
-            if (!scriptMode) {
-                break;
-            }
-
-            console.log({ scriptMode });
-
-            // collect contacts URL
-            let contacts = [];
-
-            // future contacts to scrape
-            let futureContacts = [];
+        if (loggedIn) {
+            await page.waitFor(randomWait());
 
             if (scriptMode !== "Resume") {
                 // navigate to connections page
                 await page.goto("https://www.linkedin.com/mynetwork/invite-connect/connections/", {
                     waitUntil: "networkidle2",
                 });
-                httpRequestCount++;
+                await page.waitFor(randomWait());
 
-                // scroll
-                contacts = await scrollPage(page, googleSheet);
+                await MongoDB.incrementHttpRequestCount(client);
 
-                let numContacts = contacts.length;
-                console.log({ numContacts });
+                await scrollPage(page, user);
 
-                if (contacts.length > 80) {
-                    futureContacts = contacts.splice(80);
-                } else if (scriptMode === "Update" && contacts.length < 1) {
-                    googleSheet = await scriptType(wksht, httpRequestCount);
-                    scriptMode = googleSheet.scriptMode;
-                    contacts = [...googleSheet.contacts];
+                await page.waitFor(randomWait());
+            }
+
+            while (loggedIn) {
+                let nextContact = await MongoDB.getNextConnection(client);
+
+                if (!nextContact) {
+                    break;
                 }
-            } else {
-                contacts = [...googleSheet.contacts];
-            }
 
-            // scrape each contacts page
-            let allContactsData = await scrapeContacts(page, contacts, httpRequestCount);
-
-            httpRequestCount = allContactsData.httpRequestCount || 80;
-
-            if (futureContacts.length > 0) {
-                // push futureContacts onto allContactsData.contacts object
-                futureContacts.forEach((profile) => {
-                    let contactObj = {};
-                    contactObj.firstName = "";
-                    contactObj.lastName = "";
-                    contactObj.job = "";
-                    contactObj.city = "";
-                    contactObj.company = "";
-                    contactObj.email = "";
-                    contactObj.phone = "";
-                    contactObj.profile = profile;
-                    contactObj.connected = "";
-                    contactObj.birthday = "";
-                    allContactsData.contacts.push(contactObj);
+                await page.goto(`${nextContact}detail/contact-info/`, {
+                    waitUntil: "networkidle2",
                 });
-            }
 
-            // export scraped contacts
-            await exportData(allContactsData, scriptMode);
+                await page.waitFor(randomWait());
 
-            if (httpRequestCount >= 80) {
-                loggedIn = false;
-            } else if (scriptMode === "Resume") {
-                loggedIn = false;
+                if (page.url() !== "https://www.linkedin.com/in/unavailable/") {
+                    let contactProfile = await page.evaluate(scrapeContact);
+
+                    let contactProfileAirtable = convertToAirtableRecord(contactProfile);
+
+                    let airtableRecordID = await AirtableClass.createRecord(
+                        client,
+                        contactProfileAirtable
+                    );
+
+                    let contactProfileMongoDB = {
+                        ...contactProfile,
+                        airtableRecordID,
+                    };
+
+                    await MongoDB.addProfile(client, contactProfileMongoDB);
+                }
+
+                let httpCount = await MongoDB.incrementHttpRequestCount(client);
+
+                await page.waitFor(randomWait());
+
+                if (httpCount >= httpRequestMax) {
+                    loggedIn = false;
+                }
             }
         }
 
@@ -127,12 +133,10 @@ let httpRequestCount = 0;
         await browser.close();
         console.log("Browser closed");
     } catch (error) {
-        console.log(`LINKEDINSCRAPER.JS ERROR --- ${error}`);
+        // close browser
+        await browser.close();
+        console.log("Browser closed");
 
-        // take screenshot to analyze problem
-        await page.screenshot({ path: "./image.jpg", type: "jpeg" });
-
-        // export scraped contacts
-        await exportData(allContactsData, scriptMode);
+        console.log(`INDEX.JS ERROR --- ${error}`);
     }
-})();
+};

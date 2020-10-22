@@ -4,18 +4,31 @@ const Airtable = require("airtable");
 
 const base = new Airtable({ apiKey: process.env.AIRTABLE_API_KEY }).base("app5w9e4NrsA14kZa");
 
-module.exports = async (projectName, fields) => {
-    try {
-        base(projectName).create([{ fields }], (err, records) => {
-            if (err) {
-                console.error(err);
-                return;
-            }
-            records.forEach((record) => {
-                console.log("Created record with ID = ", record.getId());
+class AirtableClass {
+    async createRecord(tableName, record) {
+        return new Promise((resolve, reject) => {
+            base(tableName).create(record, (err, record) => {
+                if (err) {
+                    console.error(err);
+                    reject(err);
+                }
+                resolve(record.getId());
             });
         });
-    } catch (error) {
-        console.log(`AIRTABLE ERROR --- ${error}`);
     }
-};
+
+    async getSingleRecordFrom(tableName, id) {
+        return new Promise((resolve, reject) => {
+            base(tableName).find(id, (err, record) => {
+                if (err) {
+                    console.error(err);
+                    reject(err);
+                }
+
+                resolve(record);
+            });
+        });
+    }
+}
+
+module.exports = new AirtableClass();
