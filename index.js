@@ -74,19 +74,19 @@ const scrapeLinkedin = async () => {
         if (loggedIn) {
             await page.waitFor(randomWait());
 
-            if (scriptMode !== "Resume") {
-                // navigate to connections page
-                await page.goto("https://www.linkedin.com/mynetwork/invite-connect/connections/", {
-                    waitUntil: "networkidle2",
-                });
-                await page.waitFor(randomWait());
+            // navigate to connections page
+            await page.goto("https://www.linkedin.com/mynetwork/invite-connect/connections/", {
+                waitUntil: "networkidle2",
+            });
+            await page.waitFor(randomWait());
 
-                await MongoDB.incrementHttpRequestCount(client);
+            await MongoDB.incrementHttpRequestCount(client);
 
-                await scrollPage(page, user);
+            await scrollPage(page, user);
 
-                await page.waitFor(randomWait());
-            }
+            await page.waitFor(randomWait());
+
+            await MongoDB.updateUserField({ scriptMode: "Update" });
 
             while (loggedIn) {
                 let nextContact = await MongoDB.getNextConnection(client);
