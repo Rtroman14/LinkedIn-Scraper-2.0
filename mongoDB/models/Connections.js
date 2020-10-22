@@ -8,7 +8,6 @@ const connectionSchema = new Schema(
         _user: { type: Schema.Types.ObjectId, ref: "User" },
         account: String,
         connectionsProfile: [ProfileSchema],
-        // connectionsProfile: { type: Schema.Types.Mixed, default: {} },
         connections: [ContactSchema],
     },
     { minimize: false }
