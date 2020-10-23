@@ -1,5 +1,8 @@
 module.exports = {
-    checkForScrapedContact() {
+    checkForScrapedContact(lastConnections) {
+        const secondLastContact = lastConnections[0].profileUrl;
+        const lastContact = lastConnections[1].profileUrl;
+
         try {
             let newConnections = [];
 

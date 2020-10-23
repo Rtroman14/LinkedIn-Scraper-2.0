@@ -57,7 +57,7 @@ class MongoDB {
                         console.log("ERROR UPDATED USER FIELD ---", err);
                     }
 
-                    console.log("Updated user =", updatedUser);
+                    console.log("Updated user =", attributes);
                 }
             );
         } else {
@@ -117,7 +117,7 @@ class MongoDB {
         try {
             const existingConnection = await this.getUserConnection(client);
 
-            return existingConnection.connections.slice(-2);
+            return existingConnection.connectionsProfile.slice(-2);
         } catch (error) {
             console.log("ERROR GETTING LAST TWO CONNECTIONS ---", error);
         }

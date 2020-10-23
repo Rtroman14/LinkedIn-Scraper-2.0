@@ -18,7 +18,7 @@ mongoose.connect(process.env.MONGO_DB, {
     useFindAndModify: false,
 });
 
-const account = "Ryan Roman";
+const account = "Roy Martin";
 
 let user;
 let client;
@@ -52,7 +52,7 @@ let httpRequestMax = Math.floor(Math.random() * (80 - 68)) + 68;
 const scrapeLinkedin = async () => {
     try {
         const browser = await puppeteer.launch({
-            headless: false,
+            headless: true,
             // args: [
             //     "--proxy-server=zproxy.lum-superproxy.io:22225",
             //     // "--no-sandbox",

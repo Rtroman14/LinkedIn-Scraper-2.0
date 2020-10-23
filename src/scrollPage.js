@@ -13,14 +13,16 @@ module.exports = async (page, user) => {
         let currentHeight = await page.evaluate("document.scrollingElement.scrollHeight");
         let total = 0;
 
-        let secondLastContact;
-        let lastContact;
+        // let secondLastContact;
+        // let lastContact;
+
+        let lastConnections;
 
         if (scriptMode === "Update") {
-            let lastConnections = await MongoDB.getLastTwoConnections(client);
+            lastConnections = await MongoDB.getLastTwoConnections(client);
 
-            secondLastContact = lastConnections[0].profileUrl;
-            lastContact = lastConnections[1].profileUrl;
+            // secondLastContact = lastConnections[0].profileUrl;
+            // lastContact = lastConnections[1].profileUrl;
         }
 
         while (previousHeight < currentHeight) {
@@ -39,7 +41,7 @@ module.exports = async (page, user) => {
 
             // return list of updated contacts
             if (scriptMode === "Update") {
-                const newConnections = await page.evaluate(checkForScrapedContact);
+                const newConnections = await page.evaluate(checkForScrapedContact(lastConnections));
 
                 if (newConnections) {
                     for (let connection of newConnections) {

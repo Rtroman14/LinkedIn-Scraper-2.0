@@ -1,9 +1,9 @@
 module.exports = async (page) => {
     try {
-        await page.goto("https://www.linkedin.com/feed/", { waitUntil: "networkidle0" });
+        await page.goto("https://www.linkedin.com/feed/", { waitUntil: "networkidle2" });
 
         // wait for element
-        await page.waitForSelector("header.msg-overlay-bubble-header");
+        await page.waitForSelector(".msg-overlay-bubble-header");
 
         if (page.url().includes("linkedin.com/feed")) {
             console.log("SUCCESSFULLY SET COOKIES");
