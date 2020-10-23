@@ -1,32 +1,36 @@
 module.exports = {
-    checkForScrapedContact(lastConnections) {
-        const secondLastContact = lastConnections[0].profileUrl;
-        const lastContact = lastConnections[1].profileUrl;
+    async checkForScrapedContact(page, lastConnections) {
+        return await page.evaluate((lastConnections) => {
+            const secondLastContact = lastConnections[0].profileUrl;
+            const lastContact = lastConnections[1].profileUrl;
 
-        try {
-            let newConnections = [];
+            try {
+                let newConnections = [];
 
-            const connections = document.querySelectorAll(".mn-connection-card__details > a");
+                const connections = document.querySelectorAll(".mn-connection-card__details > a");
 
-            for (let connection of connections) {
-                let contact = {};
+                for (let connection of connections) {
+                    let contact = {};
 
-                if (connection.href === lastContact || connection.href === secondLastContact) {
-                    console.log("RETURN NEWCONNECTIONS");
-                    return newConnections.reverse();
-                } else {
-                    contact.name = connection.querySelector(".mn-connection-card__name").innerText;
-                    contact.profileUrl = connection.href;
+                    if (connection.href === lastContact || connection.href === secondLastContact) {
+                        console.log("RETURN NEWCONNECTIONS");
+                        return newConnections;
+                    } else {
+                        contact.name = connection.querySelector(
+                            ".mn-connection-card__name"
+                        ).innerText;
+                        contact.profileUrl = connection.href;
 
-                    newConnections.push(contact);
-                    console.log("PUSH CONTACT");
+                        newConnections.push(contact);
+                        console.log("PUSH CONTACT");
+                    }
                 }
-            }
 
-            return false;
-        } catch (error) {
-            console.log("CHECKFORSCRAPEDCONTACT ERROR ---", error);
-        }
+                return false;
+            } catch (error) {
+                console.log("CHECKFORSCRAPEDCONTACT ERROR ---", error);
+            }
+        }, lastConnections);
     },
 
     getAllContacts() {

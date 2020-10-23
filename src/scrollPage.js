@@ -1,7 +1,7 @@
 const MongoDB = require("../mongoDB/index");
 const mongoose = require("mongoose");
 
-const { checkForScrapedContact, getAllContacts, scroll } = require("./helpers");
+const { getAllContacts, scroll, checkForScrapedContact } = require("./helpers");
 
 const Contact = mongoose.model("contact");
 
@@ -13,16 +13,10 @@ module.exports = async (page, user) => {
         let currentHeight = await page.evaluate("document.scrollingElement.scrollHeight");
         let total = 0;
 
-        // let secondLastContact;
-        // let lastContact;
-
         let lastConnections;
 
         if (scriptMode === "Update") {
             lastConnections = await MongoDB.getLastTwoConnections(client);
-
-            // secondLastContact = lastConnections[0].profileUrl;
-            // lastContact = lastConnections[1].profileUrl;
         }
 
         while (previousHeight < currentHeight) {
@@ -41,7 +35,7 @@ module.exports = async (page, user) => {
 
             // return list of updated contacts
             if (scriptMode === "Update") {
-                const newConnections = await page.evaluate(checkForScrapedContact(lastConnections));
+                const newConnections = await checkForScrapedContact(page, lastConnections);
 
                 if (newConnections) {
                     for (let connection of newConnections) {

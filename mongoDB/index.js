@@ -103,6 +103,10 @@ class MongoDB {
 
             const nextConnection = existingConnection.connections.$pop();
 
+            if (!nextConnection) {
+                return false;
+            }
+
             existingConnection.save();
 
             return nextConnection.profileUrl;

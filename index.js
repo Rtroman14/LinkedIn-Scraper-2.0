@@ -86,7 +86,7 @@ const scrapeLinkedin = async () => {
 
             await page.waitFor(randomWait());
 
-            await MongoDB.updateUserField({ scriptMode: "Update" });
+            await MongoDB.updateUserField(client, { scriptMode: "Update" });
 
             while (loggedIn) {
                 let nextContact = await MongoDB.getNextConnection(client);
