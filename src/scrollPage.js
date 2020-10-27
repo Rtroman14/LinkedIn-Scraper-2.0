@@ -1,9 +1,6 @@
 const MongoDB = require("../mongoDB/index");
-const mongoose = require("mongoose");
 
 const { getAllContacts, scroll, checkForScrapedContact } = require("./helpers");
-
-const Contact = mongoose.model("contact");
 
 module.exports = async (page, user) => {
     try {
@@ -38,11 +35,11 @@ module.exports = async (page, user) => {
                 const newConnections = await checkForScrapedContact(page, lastConnections);
 
                 if (newConnections) {
-                    for (let connection of newConnections) {
-                        const contact = new Contact(connection);
-
-                        await MongoDB.addConnection(client, contact);
+                    for (let connection of newConnections.reverse()) {
+                        await MongoDB.addConnection(client, connection);
                     }
+
+                    await MongoDB.addLastConnections(client, newConnections.slice(0, 2));
 
                     return;
                 }
@@ -56,6 +53,8 @@ module.exports = async (page, user) => {
         for (let newConnection of newConnections) {
             await MongoDB.addConnection(client, newConnection);
         }
+
+        await MongoDB.addLastConnections(client, newConnections.slice(0, 2));
 
         return;
     } catch (error) {

@@ -18,11 +18,12 @@ mongoose.connect(process.env.MONGO_DB, {
     useFindAndModify: false,
 });
 
-const account = "Roy Martin";
+// const account = "Roy Martin";
+// const account = "Paul Pendergast";
+const account = "Randy Brothers";
 
 let user;
 let client;
-let scriptMode;
 
 let httpRequestMax = Math.floor(Math.random() * (80 - 68)) + 68;
 
@@ -30,7 +31,6 @@ let httpRequestMax = Math.floor(Math.random() * (80 - 68)) + 68;
     try {
         user = await MongoDB.getUser(account);
         client = user.client;
-        scriptMode = user.scriptMode;
 
         const date = new Date(user.lastRun);
         const lastRunTime = moment(date).format("YYYY-MM-DD");
@@ -128,6 +128,9 @@ const scrapeLinkedin = async () => {
                 }
             }
         }
+
+        const today = moment(new Date()).format("YYYY-MM-DD");
+        await MongoDB.updateUserField(client, today);
 
         // close browser
         await browser.close();

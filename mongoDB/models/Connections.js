@@ -9,6 +9,7 @@ const connectionSchema = new Schema(
         account: String,
         connectionsProfile: [ProfileSchema],
         connections: [ContactSchema],
+        lastConnections: [ContactSchema],
     },
     { minimize: false }
 );
