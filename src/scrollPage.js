@@ -35,11 +35,16 @@ module.exports = async (page, user) => {
                 const newConnections = await checkForScrapedContact(page, lastConnections);
 
                 if (newConnections) {
+                    console.log("ADDING NEW CONNECTIONS TO MONGODB");
                     for (let connection of newConnections.reverse()) {
                         await MongoDB.addConnection(client, connection);
                     }
 
-                    await MongoDB.addLastConnections(client, newConnections.slice(0, 2));
+                    const lastContacts = newConnections.slice(0, 2);
+
+                    for (let contact of lastContacts) {
+                        await MongoDB.addLastConnections(client, contact);
+                    }
 
                     return;
                 }
@@ -55,6 +60,8 @@ module.exports = async (page, user) => {
         }
 
         await MongoDB.addLastConnections(client, newConnections.slice(0, 2));
+
+        await MongoDB.updateUserField(client, { scriptMode: "Update" });
 
         return;
     } catch (error) {

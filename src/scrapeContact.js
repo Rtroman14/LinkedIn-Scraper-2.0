@@ -30,7 +30,7 @@ module.exports = () => {
         contactObj.company = getText(document, "span.lt-line-clamp--multi-line");
         contactObj.email = contactInfo("Email", ".pv-contact-info__contact-link");
         contactObj.phone = contactInfo("Phone", ".pv-contact-info__ci-container > span");
-        contactObj.profileUrl = location.href;
+        contactObj.profileUrl = location.href.slice(0, location.href.search("detail"));
         contactObj.connected = contactInfo("Connected", ".pv-contact-info__contact-item");
         contactObj.birthday = contactInfo("Birthday", ".pv-contact-info__contact-item");
 

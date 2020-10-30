@@ -13,7 +13,7 @@ module.exports = async (page) => {
             return false;
         }
     } catch (error) {
-        console.log("ERROR NAVIGATING TO WWW.LINKEDIN.COM ---", error);
+        console.log("NEEDS NEW COOKIES!");
         return false;
     }
 };

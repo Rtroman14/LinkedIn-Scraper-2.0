@@ -20,7 +20,14 @@ mongoose.connect(process.env.MONGO_DB, {
 
 // const account = "Roy Martin";
 // const account = "Paul Pendergast";
-const account = "Randy Brothers";
+// const account = "Randy Brothers";
+// const account = "Tyler Freilinger";
+// const account = "Aaron Confessori";
+// const account = "Ben Farha";
+// const account = "Scott Adams";
+// const account = "SFY_Rachel";
+const account = "SFY_Paige";
+// const account = "Randy Flint"; // COOKIES
 
 let user;
 let client;
@@ -86,8 +93,6 @@ const scrapeLinkedin = async () => {
 
             await page.waitFor(randomWait());
 
-            await MongoDB.updateUserField(client, { scriptMode: "Update" });
-
             while (loggedIn) {
                 let nextContact = await MongoDB.getNextConnection(client);
 
@@ -125,12 +130,13 @@ const scrapeLinkedin = async () => {
 
                 if (httpCount >= httpRequestMax) {
                     loggedIn = false;
+                    const today = moment(new Date()).format("YYYY-MM-DD");
+                    await MongoDB.updateUserField(client, { lastRun: today });
                 }
             }
+        } else {
+            await MongoDB.updateUserField(client, { cookieStatus: false });
         }
-
-        const today = moment(new Date()).format("YYYY-MM-DD");
-        await MongoDB.updateUserField(client, today);
 
         // close browser
         await browser.close();

@@ -87,8 +87,6 @@ class MongoDB {
             await existingConnection.lastConnections.push(newContact);
             await existingConnection.save();
 
-            console.log("Added", contact);
-
             return;
         } catch (error) {
             console.log("ERROR ADDING CONNECTION ---", error);
@@ -141,6 +139,23 @@ class MongoDB {
             console.log("ERROR GETTING LAST TWO CONNECTIONS ---", error);
         }
     }
+
+    // async updateLastConnections(client, newConnections) {
+    //     try {
+    //         const user = this.getUser(client);
+
+    //         await Connection.updateOne(
+    //             {
+    //                 _user: user._id,
+    //             },
+    //             {
+    //                 $set: { lastConnections: newConnections }, // set
+    //             }
+    //         ); // "updateOne" code above locates record. "exec()" executes it
+    //     } catch (error) {
+    //         console.log("ERROR UPDATING LAST CONNECTIONS ---", error);
+    //     }
+    // }
 
     async incrementHttpRequestCount(client) {
         const user = await this.getUser(client);
