@@ -99,7 +99,7 @@ const scrapeLinkedin = async () => {
                 if (!nextContact) {
                     const today = moment(new Date()).format("YYYY-MM-DD");
                     await MongoDB.updateUserField(client, { lastRun: today });
-                    await AirtableClass.updateRecord(airtableRecordID, { "Last Run": today });
+                    await AirtableClass.updateRecord(user.airtableRecordID, { "Last Run": today });
 
                     break;
                 }
@@ -136,12 +136,12 @@ const scrapeLinkedin = async () => {
                     loggedIn = false;
                     const today = moment(new Date()).format("YYYY-MM-DD");
                     await MongoDB.updateUserField(client, { lastRun: today });
-                    await AirtableClass.updateRecord(airtableRecordID, { "Last Run": today });
+                    await AirtableClass.updateRecord(user.airtableRecordID, { "Last Run": today });
                 }
             }
         } else {
             await MongoDB.updateUserField(client, { cookieStatus: false });
-            await AirtableClass.updateRecord(airtableRecordID, { "Cookie Status": "Expired" });
+            await AirtableClass.updateRecord(user.airtableRecordID, { "Cookie Status": "Expired" });
         }
 
         // close browser
