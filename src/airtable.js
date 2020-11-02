@@ -29,6 +29,20 @@ class AirtableClass {
             });
         });
     }
+
+    async updateRecord(id, attrs) {
+        return new Promise((resolve, reject) => {
+            base("Clients").update(id, attrs, (err, record) => {
+                if (err) {
+                    console.error(err);
+                    reject();
+                    return;
+                }
+
+                resolve(record);
+            });
+        });
+    }
 }
 
 module.exports = new AirtableClass();

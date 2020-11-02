@@ -26,7 +26,7 @@ mongoose.connect(process.env.MONGO_DB, {
 // const account = "Ben Farha";
 // const account = "Scott Adams";
 // const account = "SFY_Rachel";
-const account = "SFY_Paige";
+// const account = "SFY_Paige"; // COOKIES
 // const account = "Randy Flint"; // COOKIES
 
 let user;
@@ -97,6 +97,10 @@ const scrapeLinkedin = async () => {
                 let nextContact = await MongoDB.getNextConnection(client);
 
                 if (!nextContact) {
+                    const today = moment(new Date()).format("YYYY-MM-DD");
+                    await MongoDB.updateUserField(client, { lastRun: today });
+                    await AirtableClass.updateRecord(airtableRecordID, { "Last Run": today });
+
                     break;
                 }
 
@@ -132,10 +136,12 @@ const scrapeLinkedin = async () => {
                     loggedIn = false;
                     const today = moment(new Date()).format("YYYY-MM-DD");
                     await MongoDB.updateUserField(client, { lastRun: today });
+                    await AirtableClass.updateRecord(airtableRecordID, { "Last Run": today });
                 }
             }
         } else {
             await MongoDB.updateUserField(client, { cookieStatus: false });
+            await AirtableClass.updateRecord(airtableRecordID, { "Cookie Status": "Expired" });
         }
 
         // close browser

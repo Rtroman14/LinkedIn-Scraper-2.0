@@ -10,6 +10,7 @@ const userSchema = new Schema({
     proxyPassword: String,
     scriptMode: { type: String, default: "Initial" },
     httpRequestCount: { type: Number, default: 0 },
+    airtableRecordID: { type: String, default: "" },
 });
 
 // "users" = collection name
