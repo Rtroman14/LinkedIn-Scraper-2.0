@@ -21,13 +21,13 @@ mongoose.connect(process.env.MONGO_DB, {
 // const account = "Roy Martin";
 // const account = "Paul Pendergast";
 // const account = "Randy Brothers";
-// const account = "Tyler Freilinger";
 // const account = "Aaron Confessori";
 // const account = "Ben Farha";
 // const account = "Scott Adams";
 // const account = "SFY_Rachel";
-// const account = "SFY_Paige"; // COOKIES
+// const account = "SFY_Paige"; //
 // const account = "Randy Flint"; // COOKIES
+// const account = "Tony Poole";
 
 let user;
 let client;
