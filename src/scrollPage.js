@@ -59,7 +59,12 @@ module.exports = async (page, user) => {
             await MongoDB.addConnection(client, newConnection);
         }
 
-        await MongoDB.addLastConnections(client, newConnections.slice(0, 2));
+        // await MongoDB.addLastConnections(client, newConnections.slice(0, 2));
+        const lastContacts = newConnections.slice(0, 2);
+
+        for (let contact of lastContacts) {
+            await MongoDB.addLastConnections(client, contact);
+        }
 
         await MongoDB.updateUserField(client, { scriptMode: "Update" });
 

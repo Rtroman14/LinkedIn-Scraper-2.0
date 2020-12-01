@@ -43,6 +43,22 @@ class AirtableClass {
             });
         });
     }
+
+    async getCookie() {
+        const table = base("Clients");
+
+        const records = await table
+            .select({ filterByFormula: "{Cookie Status} = 'Update'" })
+            .firstPage();
+
+        // return record;
+        return records.map((record) => {
+            return {
+                name: record.fields.User,
+                cookie: record.fields.Cookie,
+            };
+        });
+    }
 }
 
 module.exports = new AirtableClass();

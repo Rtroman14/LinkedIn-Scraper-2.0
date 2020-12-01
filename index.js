@@ -25,9 +25,10 @@ mongoose.connect(process.env.MONGO_DB, {
 // const account = "Ben Farha";
 // const account = "Scott Adams";
 // const account = "SFY_Rachel";
-// const account = "SFY_Paige"; //
-// const account = "Randy Flint"; // COOKIES
+// const account = "SFY_Paige";
+// const account = "Randy Flint";
 // const account = "Tony Poole";
+// const account = "Andrew Goslovich"; // lastConnections not populated in MongoDB
 
 let user;
 let client;
@@ -61,11 +62,11 @@ const scrapeLinkedin = async () => {
         const browser = await puppeteer.launch({
             headless: true,
             // args: [
-            //     "--proxy-server=zproxy.lum-superproxy.io:22225",
-            //     // "--no-sandbox",
-            //     // "--disable-setuid-sandbox",
-            //     // "--disable-dev-shm-usage",
-            //     // "--disable-gpu",
+            // "--proxy-server=zproxy.lum-superproxy.io:22225",
+            // "--no-sandbox",
+            // "--disable-setuid-sandbox",
+            // "--disable-dev-shm-usage",
+            // "--disable-gpu",
             // ],
         });
 
