@@ -18,18 +18,7 @@ mongoose.connect(process.env.MONGO_DB, {
     useFindAndModify: false,
 });
 
-// const account = "Roy Martin";
-// const account = "Paul Pendergast";
-// const account = "Randy Brothers";
-// const account = "Aaron Confessori";
-// const account = "Ben Farha";
-// const account = "Scott Adams";
-// const account = "SFY_Rachel";
-// const account = "SFY_Paige";
-// const account = "Randy Flint";
-// const account = "Tony Poole";
-// const account = "Andrew Goslovich"; // lastConnections not populated in MongoDB
-
+let account;
 let user;
 let client;
 
@@ -37,6 +26,7 @@ let httpRequestMax = Math.floor(Math.random() * (80 - 68)) + 68;
 
 (async () => {
     try {
+        account = await AirtableClass.getNextUser();
         user = await MongoDB.getUser(account);
         client = user.client;
 
@@ -73,6 +63,8 @@ const scrapeLinkedin = async () => {
         const page = await browser.newPage();
 
         await configBrowser(page, user);
+
+        console.log(`Launching ${account}'s account`);
 
         await MongoDB.updateUserField(client, { httpRequestCount: 0 });
 

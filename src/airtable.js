@@ -59,6 +59,30 @@ class AirtableClass {
             };
         });
     }
+
+    async getNextUser() {
+        const table = base("Clients");
+
+        const records = await table
+            .select({ filterByFormula: "IF(AND({Status}='Active'),({Cookie Status} = 'Active'))" })
+            .firstPage();
+
+        // return record;
+        const clients = records.map((record) => {
+            return {
+                name: record.fields.User,
+                lastRun: record.fields["Last Run"],
+            };
+        });
+
+        clients.sort((a, b) => {
+            let dateA = new Date(a.lastRun),
+                dateB = new Date(b.lastRun);
+            return dateA - dateB; //sort by date ascending
+        });
+
+        return clients[0].name;
+    }
 }
 
 module.exports = new AirtableClass();
