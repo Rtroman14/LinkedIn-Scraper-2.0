@@ -48,8 +48,6 @@ module.exports = async (page, user) => {
 
                     return;
                 }
-
-                return;
             }
 
             currentHeight = await page.evaluate("document.scrollingElement.scrollHeight");
