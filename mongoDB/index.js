@@ -84,6 +84,14 @@ class MongoDB {
 
             const newContact = new Contact(contact);
 
+            const numLastConnections = await existingConnection.lastConnections.length;
+
+            if (numLastConnections < 2) {
+                await existingConnection.lastConnections.push(newContact);
+                await existingConnection.save();
+                return;
+            }
+
             await existingConnection.lastConnections.shift();
             await existingConnection.lastConnections.push(newContact);
             await existingConnection.save();
